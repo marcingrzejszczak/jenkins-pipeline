@@ -229,6 +229,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 	deliveryPipelineConfiguration('Test', 'Deploy to test latest prod version')
 	wrappers {
 		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
+		maskPasswords()
 	}
 	scm {
 		git {
@@ -463,7 +464,7 @@ dsl.deliveryPipelineView("${projectName}-pipeline") {
 String logInToCf(String redownloadInfra, String cfUsername, String cfPassword, String cfOrg, String cfSpace) {
 	return """
 		CF_INSTALLED=\$( cf --version || echo "false" )
-		CF_DOWNLOADED=\$( test -r cf && echo "true" )
+		CF_DOWNLOADED=\$( test -r cf && echo "true" || echo "false" )
 		if [[ \${CF_INSTALLED} == "false" && (\${CF_DOWNLOADED} == "false" || \${CF_DOWNLOADED} == "true" && ${redownloadInfra} == "true") ]]; then
 			echo "Downloading Cloud Foundry"
 			curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
