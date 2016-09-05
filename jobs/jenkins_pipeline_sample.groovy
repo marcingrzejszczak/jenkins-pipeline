@@ -242,12 +242,13 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		shell("""#!/bin/bash
 		set -e
 		# Find latest prod version
-		LATEST_PROD_VERSION=\$( ${findLatestProdTag()} )
+		LATEST_PROD_TAG=\$( ${findLatestProdTag()} )
 		echo "Last prod version equals \${LATEST_PROD_VERSION}"
-		if [[ -z "\${LATEST_PROD_VERSION}" ]]; then
+		if [[ -z "\${LATEST_PROD_TAG}" ]]; then
 			echo "No prod release took place - skipping this step"
 		else
 			# Downloading latest jar
+			LATEST_PROD_VERSION=${extractVersionFromProdTag('LATEST_PROD_TAG')}
 			${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
@@ -623,6 +624,13 @@ String findLatestProdTag() {
 	LAST_PROD_TAG=${LAST_PROD_TAG#refs/tags/}
 	echo ${LAST_PROD_TAG}
 	'''
+}
+
+String extractVersionFromProdTag(String tag) {
+	return """
+	LAST_PROD_VERSION=\${${tag}#prod/}
+	echo \${LAST_PROD_VERSION}
+	"""
 }
 
 //  ======= FUNCTIONS =======
