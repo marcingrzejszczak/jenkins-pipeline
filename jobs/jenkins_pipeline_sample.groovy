@@ -172,7 +172,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
 		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
-		shell("""\
+		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
@@ -324,7 +324,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
 		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
-		shell("""\
+		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfStageUsername, cfStagePassword, cfStageOrg, cfStageSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
@@ -402,7 +402,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
-		shell("""\
+		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfProdUsername, cfProdPassword, cfProdOrg, cfProdSpace)}
 		# deploy the app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
