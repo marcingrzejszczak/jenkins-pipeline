@@ -471,9 +471,9 @@ String logInToCf(String redownloadInfra, String cfUsername, String cfPassword, S
 		fi
 
 		if [[ \${CF_DOWNLOADED} == "true" ]]; then
-			echo "Setting alias to cf"
-			alias cf=`pwd`/cf
-			export cf=`pwd`/cf
+			echo "Adding CF to PATH"
+			PATH=\${PATH}:`pwd`
+			chmod +x cf
 		fi
 
 		echo "Cloud foundry version"
