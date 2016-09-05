@@ -244,12 +244,13 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		set -e
 		# Find latest prod version
 		LATEST_PROD_TAG=\$( ${findLatestProdTag()} )
-		echo "Last prod version equals \${LATEST_PROD_TAG}"
+		echo "Last prod tag equals \${LATEST_PROD_TAG}"
 		if [[ -z "\${LATEST_PROD_TAG}" ]]; then
 			echo "No prod release took place - skipping this step"
 		else
 			# Downloading latest jar
 			LATEST_PROD_VERSION=\${LATEST_PROD_TAG#prod/}
+			echo "Last prod version equals \${LATEST_PROD_VERSION}"
 			${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
@@ -599,10 +600,10 @@ String extractMavenProperty(String prop) {
 // The values of group / artifact ids can be later retrieved from Maven
 String downloadJar(String redownloadInfra, String repoWithJars, String groupId, String artifactId, String version) {
 	return """
-	if [[ ${redownloadInfra} == "true" ]]; then
+	DESTINATION=target/${artifactId}-${version}.jar
+	if [[ ! -e \${DESTINATION} || ( -e \${DESTINATION} && ${redownloadInfra} == "true" ) ]]; then
 		mkdir target --parents
 		PATH_TO_JAR=${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar
-		DESTINATION=target/${artifactId}-${version}.jar
 		echo "Downloading \${PATH_TO_JAR} to \${DESTINATION}"
 		curl \${PATH_TO_JAR} -o \${DESTINATION}
 	fi
