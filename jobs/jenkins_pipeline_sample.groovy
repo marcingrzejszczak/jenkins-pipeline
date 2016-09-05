@@ -187,7 +187,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		downstreamParameterized {
 			trigger("${projectName}-test-env-test") {
 				parameters {
-					propertiesFile('target/test.properties')
+					propertiesFile('target/test.properties', true)
 					currentBuild()
 				}
 				triggerWithNoParameters()
@@ -255,6 +255,8 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 			# deploy app
 			${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${LATEST_PROD_VERSION}")}
 			${propagatePropertiesForTests(projectArtifactId)}
+			# Adding latest prod tag
+			echo "LATEST_PROD_TAG=\${LATEST_PROD_TAG}" >> target/test.properties
 		fi
 		""")
 	}
@@ -263,7 +265,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 			trigger("${projectName}-test-env-rollback-test") {
 				triggerWithNoParameters()
 				parameters {
-					predefinedProp('LATEST_PROD_TAG', '${LATEST_PROD_TAG}')
+					propertiesFile('target/test.properties', true)
 					currentBuild()
 				}
 			}
@@ -275,6 +277,9 @@ dsl.job("${projectName}-test-env-rollback-test") {
 	deliveryPipelineConfiguration('Test', 'Tests on test latest prod version')
 	wrappers {
 		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
+		parameters {
+			stringParam('LATEST_PROD_TAG', 'master', 'Latest production tag. If "master" is picked then the step will be ignored')
+		}
 	}
 	scm {
 		git {
@@ -287,7 +292,7 @@ dsl.job("${projectName}-test-env-rollback-test") {
 	steps {
 		shell("""#!/bin/bash
 		set -e
-		if [[ -z "\${LATEST_PROD_TAG}" ]] ;
+		if [[ "\${LATEST_PROD_TAG}" == "master" ]]; then
 			echo "No prod release took place - skipping this step"
 		else
 			${runSmokeTests()}
@@ -295,7 +300,9 @@ dsl.job("${projectName}-test-env-rollback-test") {
 		""")
 	}
 	publishers {
-		archiveJunit('**/surefire-reports/*.xml')
+		archiveJunit('**/surefire-reports/*.xml') {
+			allowEmptyResults()
+		}
 		downstreamParameterized {
 			trigger("${projectName}-stage-env-deploy") {
 				parameters {
@@ -346,7 +353,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 			trigger("${projectName}-stage-env-test") {
 				parameters {
 					currentBuild()
-					propertiesFile('target/test.properties')
+					propertiesFile('target/test.properties', true)
 				}
 				triggerWithNoParameters()
 			}
