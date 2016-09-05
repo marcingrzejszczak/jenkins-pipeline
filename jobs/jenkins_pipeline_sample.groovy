@@ -109,6 +109,7 @@ dsl.job("${projectName}-build") {
 		}
 		parameters {
 			booleanParam('REDOWNLOAD_INFRA', false, "If Eureka & StubRunner & CF binaries should be redownloaded if already present")
+			booleanParam('REDEPLOY_INFRA', false, "If Eureka & StubRunner binaries should be redeployed if already present")
 		}
 	}
 	jdk(jdkVersion)
@@ -165,16 +166,16 @@ dsl.job("${projectName}-test-env-deploy") {
 	steps {
 		shell("""#!/bin/bash
 		# Download all the necessary jars
-		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
-		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
-		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
-		${deployEureka('${REDOWNLOAD_INFRA}', "${eurekaArtifactId}-${eurekaVersion}")}
-		${deployStubRunnerBoot('${REDOWNLOAD_INFRA}', "${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
+		${deployEureka('${REDEPLOY_INFRA}', "${eurekaArtifactId}-${eurekaVersion}")}
+		${deployStubRunnerBoot('${REDEPLOY_INFRA}', "${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
 		# deploy app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
 		${propagatePropertiesForTests(projectArtifactId)}
@@ -243,7 +244,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 			echo "No prod release took place - skipping this step"
 		else
 			# Download all the necessary jars
-			${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
+			${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
 			${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${LATEST_PROD_VERSION}")}
@@ -316,9 +317,9 @@ dsl.job("${projectName}-stage-env-deploy") {
 	steps {
 		shell("""#!/bin/bash
 		# Download all the necessary jars
-		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
-		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
-		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfStageUsername, cfStagePassword, cfStageOrg, cfStageSpace)}
@@ -390,7 +391,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 	steps {
 		shell("""#!/bin/bash
 		# Download all the necessary jars
-		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
 		shell("""#!/bin/bash
 		${logInToCf('${REDOWNLOAD_INFRA}',cfProdUsername, cfProdPassword, cfProdOrg, cfProdSpace)}
@@ -461,6 +462,8 @@ String logInToCf(String redownloadInfra, String cfUsername, String cfPassword, S
 	
 			echo "Cloud foundry version"
 			cf --version
+		else
+			echo "CF is already installed or was already downloaded but the flag to redownload was disabled"
 		fi
 
 		echo "Logging in to CF"
@@ -517,22 +520,22 @@ String restartApp(String appName) {
 	return "cf restart ${appName}"
 }
 
-String deployEureka(String redownload, String jarName, String appName = "github-eureka") {
+String deployEureka(String redeploy, String jarName, String appName = "github-eureka") {
 	return """
-	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redownload} == "true" ) ]]; then
+	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
 		${deployAppWithName(appName, jarName)}
 		${restartApp(appName)}
 		${createServiceWithName(appName)}
 	else
-		echo "The target/${jarName}.jar is missing or redownload flag was turned off"
+		echo "The target/${jarName}.jar is missing or redeploy flag was turned off"
 	fi
 	"""
 }
 
-String deployStubRunnerBoot(String redownload, String jarName, String eurekaService = "github-eureka",
+String deployStubRunnerBoot(String redeploy, String jarName, String eurekaService = "github-eureka",
 							String rabbitmqService = "github-rabbitmq", String stubRunnerName = "stubrunner") {
 	return """
-	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redownload} == "true" ) ]]; then
+	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
 		${deployAppWithName(stubRunnerName, jarName)}
 		${extractMavenProperty("stubrunner.ids")}
 		${setEnvVar(stubRunnerName, "stubrunner.ids", '${MAVEN_PROPERTY}')}
@@ -541,7 +544,7 @@ String deployStubRunnerBoot(String redownload, String jarName, String eurekaServ
 		${restartApp(stubRunnerName)}
 		${createServiceWithName(stubRunnerName)}
 	else
-		echo "The target/${jarName}.jar is missing or redownload flag was turned off"
+		echo "The target/${jarName}.jar is missing or redeploy flag was turned off"
 	fi
 	"""
 }
@@ -571,13 +574,15 @@ String extractMavenProperty(String prop) {
 }
 
 // The values of group / artifact ids can be later retrieved from Maven
-String downloadJar(String repoWithJars, String groupId, String artifactId, String version) {
+String downloadJar(String redownloadInfra, String repoWithJars, String groupId, String artifactId, String version) {
 	return """
-	mkdir target --parents
-	PATH_TO_JAR=${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar
-	DESTINATION=target/${artifactId}-${version}.jar
-	echo "Downloading \${PATH_TO_JAR} to \${DESTINATION}"
-	curl \${PATH_TO_JAR} -o \${DESTINATION}
+	if [[ ${redownloadInfra} == "true" ) ]]; then
+		mkdir target --parents
+		PATH_TO_JAR=${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar
+		DESTINATION=target/${artifactId}-${version}.jar
+		echo "Downloading \${PATH_TO_JAR} to \${DESTINATION}"
+		curl \${PATH_TO_JAR} -o \${DESTINATION}
+	fi
 	"""
 }
 
