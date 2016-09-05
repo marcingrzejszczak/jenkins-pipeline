@@ -115,7 +115,11 @@ dsl.job("${projectName}-stage-env-test") {
 		shell("echo 'Running tests on stage env'")
 	}
 	publishers {
-		buildPipelineTrigger("${projectName}-prod-env-deploy")
+		buildPipelineTrigger("${projectName}-prod-env-deploy") {
+			parameters {
+				currentBuild()
+			}
+		}
 	}
 }
 
@@ -128,7 +132,11 @@ dsl.job("${projectName}-prod-env-deploy") {
 		shell("echo 'Deploying to prod env blue instance'")
 	}
 	publishers {
-		buildPipelineTrigger("${projectName}-prod-env-complete")
+		buildPipelineTrigger("${projectName}-prod-env-complete") {
+			parameters {
+				currentBuild()
+			}
+		}
 	}
 }
 

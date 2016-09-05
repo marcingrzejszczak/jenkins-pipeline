@@ -184,6 +184,7 @@ dsl.job("${projectName}-test-env-deploy") {
 			trigger("${projectName}-test-env-test") {
 				parameters {
 					propertiesFile('target/test.properties')
+					currentBuild()
 				}
 				triggerWithNoParameters()
 			}
@@ -214,6 +215,9 @@ dsl.job("${projectName}-test-env-test") {
 		archiveJunit('**/surefire-reports/*.xml')
 		downstreamParameterized {
 			trigger("${projectName}-test-env-rollback-deploy") {
+				parameters {
+					currentBuild()
+				}
 				triggerWithNoParameters()
 			}
 		}
@@ -247,6 +251,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 				triggerWithNoParameters()
 				parameters {
 					predefinedProp('LATEST_PROD_VERSION', '${LATEST_PROD_VERSION}')
+					currentBuild()
 				}
 			}
 		}
@@ -282,6 +287,9 @@ dsl.job("${projectName}-test-env-rollback-test") {
 		archiveJunit('**/surefire-reports/*.xml')
 		downstreamParameterized {
 			trigger("${projectName}-stage-env-deploy") {
+				parameters {
+					currentBuild()
+				}
 				triggerWithNoParameters()
 			}
 		}
@@ -327,6 +335,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		downstreamParameterized {
 			trigger("${projectName}-stage-env-test") {
 				parameters {
+					currentBuild()
 					propertiesFile('target/test.properties')
 				}
 				triggerWithNoParameters()
@@ -358,7 +367,11 @@ dsl.job("${projectName}-stage-env-test") {
 	}
 	publishers {
 		archiveJunit('**/surefire-reports/*.xml')
-		buildPipelineTrigger("${projectName}-prod-env-deploy")
+		buildPipelineTrigger("${projectName}-prod-env-deploy") {
+			parameters {
+				currentBuild()
+			}
+		}
 	}
 }
 
@@ -391,7 +404,11 @@ dsl.job("${projectName}-prod-env-deploy") {
 		""")
 	}
 	publishers {
-		buildPipelineTrigger("${projectName}-prod-env-complete")
+		buildPipelineTrigger("${projectName}-prod-env-complete") {
+			parameters {
+				currentBuild()
+			}
+		}
 		git {
 			tag('origin', "prod/\${PIPELINE_VERSION}") {
 				pushOnlyIfSuccess()
