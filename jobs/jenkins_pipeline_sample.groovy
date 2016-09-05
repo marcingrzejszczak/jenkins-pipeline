@@ -21,7 +21,9 @@ import javaposse.jobdsl.dsl.DslFactory
 	- click the `Allow token macro processing` in the Jenkins configuration
 	- define the aforementioned masked env vars
 	- customize the java version
-	- add a Credential to allow pushing the Git tag
+	- add a Credential to allow pushing the Git tag. Credential is called 'git'
+	- setup `Config File Management` to ensure that every slave has the Maven's settings.xml set up.
+		Otherwise `./mvnw clean deploy` won't work
 	- if you can't see ${PIPELINE_VERSION} being resolved in the initial job, check the logs
 
 	WARNING: Skipped parameter `PIPELINE_VERSION` as it is undefined on `jenkins-pipeline-sample-build`.
@@ -163,7 +165,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		}
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -231,7 +233,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		# Find latest prod version
 		LATEST_PROD_VERSION=\$( ${findLatestProdTag()} )
 		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
@@ -276,7 +278,7 @@ dsl.job("${projectName}-test-env-rollback-test") {
 		}
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
 			echo "No prod release took place - skipping this step"
 		else
@@ -315,7 +317,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		}
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -362,7 +364,7 @@ dsl.job("${projectName}-stage-env-test") {
 		}
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		${runSmokeTests()}
 		""")
 	}
@@ -395,7 +397,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		}
 	}
 	steps {
-		shell("""#!/bin/bash\
+		shell("""#!/bin/bash
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
