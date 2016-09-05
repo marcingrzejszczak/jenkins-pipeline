@@ -243,12 +243,12 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		set -e
 		# Find latest prod version
 		LATEST_PROD_TAG=\$( ${findLatestProdTag()} )
-		echo "Last prod version equals \${LATEST_PROD_VERSION}"
+		echo "Last prod version equals \${LATEST_PROD_TAG}"
 		if [[ -z "\${LATEST_PROD_TAG}" ]]; then
 			echo "No prod release took place - skipping this step"
 		else
 			# Downloading latest jar
-			LATEST_PROD_VERSION=${extractVersionFromProdTag('LATEST_PROD_TAG')}
+			LATEST_PROD_VERSION=\${\${LATEST_PROD_TAG}#prod/}
 			${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
@@ -262,7 +262,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 			trigger("${projectName}-test-env-rollback-test") {
 				triggerWithNoParameters()
 				parameters {
-					predefinedProp('LATEST_PROD_VERSION', '${LATEST_PROD_VERSION}')
+					predefinedProp('LATEST_PROD_TAG', '${LATEST_PROD_TAG}')
 					currentBuild()
 				}
 			}
@@ -279,14 +279,14 @@ dsl.job("${projectName}-test-env-rollback-test") {
 		git {
 			remote {
 				url(fullGitRepo)
-				branch('${LATEST_PROD_VERSION}')
+				branch('${LATEST_PROD_TAG}')
 			}
 		}
 	}
 	steps {
 		shell("""#!/bin/bash
 		set -e
-		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
+		if [[ -z "\${LATEST_PROD_TAG}" ]] ;
 			echo "No prod release took place - skipping this step"
 		else
 			${runSmokeTests()}
