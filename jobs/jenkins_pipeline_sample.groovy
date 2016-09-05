@@ -165,6 +165,7 @@ dsl.job("${projectName}-test-env-deploy") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		# Download all the necessary jars
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -238,6 +239,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		# Find latest prod version
 		LATEST_PROD_VERSION=\$( ${findLatestProdTag()} )
 		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
@@ -280,6 +282,7 @@ dsl.job("${projectName}-test-env-rollback-test") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
 			echo "No prod release took place - skipping this step"
 		else
@@ -316,6 +319,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		# Download all the necessary jars
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -360,6 +364,7 @@ dsl.job("${projectName}-stage-env-test") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		${runSmokeTests()}
 		""")
 	}
@@ -390,6 +395,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 	}
 	steps {
 		shell("""#!/bin/bash
+		set -e
 		# Download all the necessary jars
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
