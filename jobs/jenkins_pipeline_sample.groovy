@@ -248,7 +248,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 			echo "No prod release took place - skipping this step"
 		else
 			# Downloading latest jar
-			LATEST_PROD_VERSION=\${\${LATEST_PROD_TAG}#prod/}
+			LATEST_PROD_VERSION=\${LATEST_PROD_TAG#prod/}
 			${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
