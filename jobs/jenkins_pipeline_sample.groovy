@@ -33,14 +33,12 @@ import javaposse.jobdsl.dsl.DslFactory
 	to whitelist specific parameter names, even though it represents a security breach
 
 	TODO: TO develop
-	- download eureka + stubrunner on demand only (will speed up things dramatically)
 	- convert all groovy functions into bash functions
 	- move the functions to src/main/bash and write bash tests
-	- always override the property of stubrunner.ids
 	- resolve group / artifact / version ids from Maven instead of passing them
 	- perform blue green deployment
 	- implement the complete step
-	- add tests for StubRUnner + Eureka
+	- add tests for StubRunner + Eureka
 */
 
 DslFactory dsl = this
@@ -109,6 +107,9 @@ dsl.job("${projectName}-build") {
 		environmentVariables {
 			maskPasswords()
 		}
+		parameters {
+			booleanParam('REDOWNLOAD_INFRA', false, "If Eureka & StubRunner & CF binaries should be redownloaded if already present")
+		}
 	}
 	jdk(jdkVersion)
 	scm {
@@ -172,11 +173,11 @@ dsl.job("${projectName}-test-env-deploy") {
 		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""\
-		${logInToCf(cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
+		${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
-		${deployEureka("${eurekaArtifactId}-${eurekaVersion}")}
-		${deployStubRunnerBoot("${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
+		${deployEureka('${REDOWNLOAD_INFRA}', "${eurekaArtifactId}-${eurekaVersion}")}
+		${deployStubRunnerBoot('${REDOWNLOAD_INFRA}', "${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
 		# deploy app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
 		${propagatePropertiesForTests(projectArtifactId)}
@@ -241,7 +242,7 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		else
 			# Download all the necessary jars
 			${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
-			${logInToCf(cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
+			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
 			${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${LATEST_PROD_VERSION}")}
 			${propagatePropertiesForTests(projectArtifactId)}
@@ -324,11 +325,11 @@ dsl.job("${projectName}-stage-env-deploy") {
 		${downloadJar(repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""\
-		${logInToCf(cfStageUsername, cfStagePassword, cfStageOrg, cfStageSpace)}
+		${logInToCf('${REDOWNLOAD_INFRA}',cfStageUsername, cfStagePassword, cfStageOrg, cfStageSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
-		${deployEureka("${eurekaArtifactId}-${eurekaVersion}")}
-		${deployStubRunnerBoot("${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
+		${deployEureka('${REDOWNLOAD_INFRA}', "${eurekaArtifactId}-${eurekaVersion}")}
+		${deployStubRunnerBoot('${REDOWNLOAD_INFRA}', "${stubRunnerBootArtifactId}-${stubRunnerBootVersion}")}
 		# deploy app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
 		${propagatePropertiesForTests(projectArtifactId)}
@@ -402,7 +403,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
 		shell("""\
-		${logInToCf(cfProdUsername, cfProdPassword, cfProdOrg, cfProdSpace)}
+		${logInToCf('${REDOWNLOAD_INFRA}',cfProdUsername, cfProdPassword, cfProdOrg, cfProdSpace)}
 		# deploy the app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
 		""")
@@ -457,17 +458,20 @@ dsl.deliveryPipelineView("${projectName}-pipeline") {
 //  ======= JOBS =======
 
 //  ======= FUNCTIONS =======
-String logInToCf(String cfUsername, String cfPassword, String cfOrg, String cfSpace) {
+String logInToCf(String redownloadInfra, String cfUsername, String cfPassword, String cfOrg, String cfSpace) {
 	return """
-		echo "Downloading Cloud Foundry"
-		curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-
-		echo "Setting alias to cf"
-		alias cf=`pwd`/cf
-		export cf=`pwd`/cf
-
-		echo "Cloud foundry version"
-		cf --version
+		CF_PRESENT=\$( cf --version || echo "false")
+		if [[ \${CF_PRESENT} == "false" && ${redownloadInfra} == "true" ]]; then
+			echo "Downloading Cloud Foundry"
+			curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
+	
+			echo "Setting alias to cf"
+			alias cf=`pwd`/cf
+			export cf=`pwd`/cf
+	
+			echo "Cloud foundry version"
+			cf --version
+		fi
 
 		echo "Logging in to CF"
 		cf api --skip-ssl-validation api.run.pivotal.io
@@ -511,31 +515,44 @@ String deployAppWithName(String appName, String jarName, boolean useManifest = f
 	"""
 }
 
+String setEnvVarIfMissing(String appName, String key, String value) {
+	return "cf env ${appName} | grep ${key} || ${setEnvVar(appName, key, value)}"
+}
+
 String setEnvVar(String appName, String key, String value) {
-	return "cf env ${appName} | grep ${key} || cf set-env ${appName} ${key} ${value}"
+	return "cf set-env ${appName} ${key} ${value}"
 }
 
 String restartApp(String appName) {
 	return "cf restart ${appName}"
 }
 
-String deployEureka(String jarName, String appName = "github-eureka") {
+String deployEureka(String redownload, String jarName, String appName = "github-eureka") {
 	return """
-	${deployAppWithName(appName, jarName)}
-	${restartApp(appName)}
-	${createServiceWithName(appName)}
+	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redownload} == "true" ) ]]; then
+		${deployAppWithName(appName, jarName)}
+		${restartApp(appName)}
+		${createServiceWithName(appName)}
+	else
+		echo "The target/${jarName}.jar is missing or redownload flag was turned off"
+	fi
 	"""
 }
 
-String deployStubRunnerBoot(String jarName, String eurekaService = "github-eureka", String rabbitmqService = "github-rabbitmq") {
+String deployStubRunnerBoot(String redownload, String jarName, String eurekaService = "github-eureka",
+							String rabbitmqService = "github-rabbitmq", String stubRunnerName = "stubrunner") {
 	return """
-	${deployAppWithName("stubrunner", jarName)}
-	${extractMavenProperty("stubrunner.ids")}
-	${setEnvVar("stubrunner", "stubrunner.ids", '${MAVEN_PROPERTY}')}
-	${bindService(eurekaService, "stubrunner")}
-	${bindService(rabbitmqService, "stubrunner")}
-	${restartApp("stubrunner")}
-	${createServiceWithName("stubrunner")}
+	if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redownload} == "true" ) ]]; then
+		${deployAppWithName(stubRunnerName, jarName)}
+		${extractMavenProperty("stubrunner.ids")}
+		${setEnvVar(stubRunnerName, "stubrunner.ids", '${MAVEN_PROPERTY}')}
+		${bindService(eurekaService, stubRunnerName)}
+		${bindService(rabbitmqService, stubRunnerName)}
+		${restartApp(stubRunnerName)}
+		${createServiceWithName(stubRunnerName)}
+	else
+		echo "The target/${jarName}.jar is missing or redownload flag was turned off"
+	fi
 	"""
 }
 
@@ -567,7 +584,10 @@ String extractMavenProperty(String prop) {
 String downloadJar(String repoWithJars, String groupId, String artifactId, String version) {
 	return """
 	mkdir target --parents
-	curl ${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar -o target/${artifactId}-${version}.jar
+	PATH_TO_JAR=${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar
+	DESTINATION=target/${artifactId}-${version}.jar
+	echo "Downloading \${PATH_TO_JAR} to \${DESTINATION}"
+	curl \${PATH_TO_JAR} -o \${DESTINATION}
 	"""
 }
 
