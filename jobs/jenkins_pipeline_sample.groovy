@@ -460,20 +460,24 @@ dsl.deliveryPipelineView("${projectName}-pipeline") {
 //  ======= FUNCTIONS =======
 String logInToCf(String redownloadInfra, String cfUsername, String cfPassword, String cfOrg, String cfSpace) {
 	return """
-		CF_PRESENT=\$( cf --version || echo "false")
-		if [[ \${CF_PRESENT} == "false" && ${redownloadInfra} == "true" ]]; then
+		CF_INSTALLED=\$( cf --version || echo "false" )
+		CF_DOWNLOADED=\$( test -r cf && echo "true" )
+		if [[ \${CF_INSTALLED} == "false" && (\${CF_DOWNLOADED} == "false" || \${CF_DOWNLOADED} == "true" && ${redownloadInfra} == "true") ]]; then
 			echo "Downloading Cloud Foundry"
 			curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github" | tar -zx
-	
-			echo "Setting alias to cf"
-			alias cf=`pwd`/cf
-			export cf=`pwd`/cf
-	
-			echo "Cloud foundry version"
-			cf --version
+			CF_DOWNLOADED="true"
 		else
 			echo "CF is already installed or was already downloaded but the flag to redownload was disabled"
 		fi
+
+		if [[ \${CF_DOWNLOADED} == "true" ]]; then
+			echo "Setting alias to cf"
+			alias cf=`pwd`/cf
+			export cf=`pwd`/cf
+		fi
+
+		echo "Cloud foundry version"
+		cf --version
 
 		echo "Logging in to CF"
 		cf api --skip-ssl-validation api.run.pivotal.io
