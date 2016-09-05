@@ -167,7 +167,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		shell("""#!/bin/bash
 		set -e
 		# Download all the necessary jars
-		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
@@ -243,11 +243,12 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 		set -e
 		# Find latest prod version
 		LATEST_PROD_VERSION=\$( ${findLatestProdTag()} )
-		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
+		echo "Last prod version equals \${LATEST_PROD_VERSION}"
+		if [[ -z "\${LATEST_PROD_VERSION}" ]]; then
 			echo "No prod release took place - skipping this step"
 		else
-			# Download all the necessary jars
-			${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
+			# Downloading latest jar
+			${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
 			${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 			# deploy app
 			${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${LATEST_PROD_VERSION}")}
@@ -322,7 +323,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		shell("""#!/bin/bash
 		set -e
 		# Download all the necessary jars
-		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
@@ -399,7 +400,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		shell("""#!/bin/bash
 		set -e
 		# Download all the necessary jars
-		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
+		${downloadJar('true', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
 		shell("""#!/bin/bash
 		set -e
