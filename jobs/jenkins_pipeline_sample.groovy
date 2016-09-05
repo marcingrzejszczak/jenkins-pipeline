@@ -162,7 +162,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		}
 	}
 	steps {
-		shell("""\
+		shell("""#!/bin/bash\
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -213,6 +213,74 @@ dsl.job("${projectName}-test-env-test") {
 	publishers {
 		archiveJunit('**/surefire-reports/*.xml')
 		downstreamParameterized {
+			trigger("${projectName}-test-env-rollback-deploy") {
+				triggerWithNoParameters()
+			}
+		}
+	}
+}
+
+dsl.job("${projectName}-test-env-rollback-deploy") {
+	deliveryPipelineConfiguration('Test', 'Deploy to test latest prod version')
+	wrappers {
+		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
+	}
+	steps {
+		shell("""#!/bin/bash\
+		# Find latest prod version
+		LATEST_PROD_VERSION=\$( ${findLatestProdTag()} )
+		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
+			echo "No prod release took place - skipping this step"
+		else
+			# Download all the necessary jars
+			${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${LATEST_PROD_VERSION}')}
+			${logInToCf(cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
+			# deploy app
+			${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${LATEST_PROD_VERSION}")}
+			${propagatePropertiesForTests(projectArtifactId)}
+		fi
+		""")
+	}
+	publishers {
+		downstreamParameterized {
+			trigger("${projectName}-test-env-rollback-test") {
+				triggerWithNoParameters()
+				parameters {
+					predefinedProp('LATEST_PROD_VERSION', '${LATEST_PROD_VERSION}')
+				}
+			}
+		}
+	}
+}
+
+dsl.job("${projectName}-test-env-rollback-test") {
+	deliveryPipelineConfiguration('Test', 'Tests on test latest prod version')
+	wrappers {
+		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
+	}
+	scm {
+		git {
+			remote {
+				url(fullGitRepo)
+				branch('${LATEST_PROD_VERSION}')
+			}
+			extensions {
+				wipeOutWorkspace()
+			}
+		}
+	}
+	steps {
+		shell("""#!/bin/bash\
+		if [[ -z "\${LATEST_PROD_VERSION}" ]] ;
+			echo "No prod release took place - skipping this step"
+		else
+			${runSmokeTests()}
+		fi
+		""")
+	}
+	publishers {
+		archiveJunit('**/surefire-reports/*.xml')
+		downstreamParameterized {
 			trigger("${projectName}-stage-env-deploy") {
 				triggerWithNoParameters()
 			}
@@ -238,7 +306,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		}
 	}
 	steps {
-		shell("""\
+		shell("""#!/bin/bash\
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		${downloadJar(repoWithJars, eurekaGroupId, eurekaArtifactId, eurekaVersion)}
@@ -284,7 +352,9 @@ dsl.job("${projectName}-stage-env-test") {
 		}
 	}
 	steps {
-		shell(runSmokeTests())
+		shell("""#!/bin/bash\
+		${runSmokeTests()}
+		""")
 	}
 	publishers {
 		archiveJunit('**/surefire-reports/*.xml')
@@ -310,7 +380,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		}
 	}
 	steps {
-		shell("""\
+		shell("""#!/bin/bash\
 		# Download all the necessary jars
 		${downloadJar(repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
@@ -480,14 +550,14 @@ String downloadJar(String repoWithJars, String groupId, String artifactId, Strin
 	"""
 }
 
-String propagatePropertiesForTests(String projectArtifactId) {
+String propagatePropertiesForTests(String projectArtifactId, String stubRunnerHost = 'stubrunner') {
 	return """
 	# retrieve host of the app / stubrunner
 	# we have to store them in a file that will be picked as properties
 	rm -rf target/test.properties
 	${appHost(projectArtifactId)}
 	echo "APPLICATION_URL=\${APP_HOST}" >> target/test.properties
-	${appHost('stubrunner')}
+	${appHost(stubRunnerHost)}
 	echo "STUBRUNNER_URL=\${APP_HOST}" >> target/test.properties
 	"""
 }
@@ -495,6 +565,14 @@ String propagatePropertiesForTests(String projectArtifactId) {
 // Function that executes integration tests
 String runSmokeTests() {
 	return './mvnw clean install -Pintegration -Dapplication.url=${APPLICATION_URL} -Dstubrunner.url=${STUBRUNNER_URL}'
+}
+
+String findLatestProdTag() {
+	return '''
+	LAST_PROD_TAG=$(git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags/prod | head -n 1)
+	LAST_PROD_TAG=${LAST_PROD_TAG#refs/tags/}
+	echo ${LAST_PROD_TAG}
+	'''
 }
 
 //  ======= FUNCTIONS =======
