@@ -172,6 +172,7 @@ dsl.job("${projectName}-test-env-deploy") {
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""#!/bin/bash
+		set -e
 		${logInToCf('${REDOWNLOAD_INFRA}',cfTestUsername, cfTestPassword, cfTestOrg, cfTestSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
@@ -326,6 +327,7 @@ dsl.job("${projectName}-stage-env-deploy") {
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, stubRunnerBootGroupId, stubRunnerBootArtifactId, stubRunnerBootVersion)}
 		""")
 		shell("""#!/bin/bash
+		set -e
 		${logInToCf('${REDOWNLOAD_INFRA}',cfStageUsername, cfStagePassword, cfStageOrg, cfStageSpace)}
 		# setup infra
 		${deployRabbitMqToCf()}
@@ -400,6 +402,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 		${downloadJar('${REDEPLOY_INFRA}', repoWithJars, projectGroupId, projectArtifactId, '${PIPELINE_VERSION}')}
 		""")
 		shell("""#!/bin/bash
+		set -e
 		${logInToCf('${REDOWNLOAD_INFRA}',cfProdUsername, cfProdPassword, cfProdOrg, cfProdSpace)}
 		# deploy the app
 		${deployAndRestartAppWithName(projectArtifactId, "${projectArtifactId}-\${PIPELINE_VERSION}")}
@@ -582,7 +585,7 @@ String extractMavenProperty(String prop) {
 // The values of group / artifact ids can be later retrieved from Maven
 String downloadJar(String redownloadInfra, String repoWithJars, String groupId, String artifactId, String version) {
 	return """
-	if [[ ${redownloadInfra} == "true" ) ]]; then
+	if [[ ${redownloadInfra} == "true" ]]; then
 		mkdir target --parents
 		PATH_TO_JAR=${repoWithJars}/${groupId.replace(".", "/")}/${artifactId}/${version}/${artifactId}-${version}.jar
 		DESTINATION=target/${artifactId}-${version}.jar
