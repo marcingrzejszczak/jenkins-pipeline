@@ -160,9 +160,6 @@ dsl.job("${projectName}-test-env-deploy") {
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
 			}
-			extensions {
-				wipeOutWorkspace()
-			}
 		}
 	}
 	steps {
@@ -207,9 +204,6 @@ dsl.job("${projectName}-test-env-test") {
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
 			}
-			extensions {
-				wipeOutWorkspace()
-			}
 		}
 	}
 	steps {
@@ -232,6 +226,14 @@ dsl.job("${projectName}-test-env-rollback-deploy") {
 	deliveryPipelineConfiguration('Test', 'Deploy to test latest prod version')
 	wrappers {
 		deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
+	}
+	scm {
+		git {
+			remote {
+				url(fullGitRepo)
+				branch('dev/${PIPELINE_VERSION}')
+			}
+		}
 	}
 	steps {
 		shell("""#!/bin/bash
@@ -273,9 +275,6 @@ dsl.job("${projectName}-test-env-rollback-test") {
 				url(fullGitRepo)
 				branch('${LATEST_PROD_VERSION}')
 			}
-			extensions {
-				wipeOutWorkspace()
-			}
 		}
 	}
 	steps {
@@ -311,9 +310,6 @@ dsl.job("${projectName}-stage-env-deploy") {
 			remote {
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
-			}
-			extensions {
-				wipeOutWorkspace()
 			}
 		}
 	}
@@ -359,9 +355,6 @@ dsl.job("${projectName}-stage-env-test") {
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
 			}
-			extensions {
-				wipeOutWorkspace()
-			}
 		}
 	}
 	steps {
@@ -391,9 +384,6 @@ dsl.job("${projectName}-prod-env-deploy") {
 				name('origin')
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
-			}
-			extensions {
-				wipeOutWorkspace()
 			}
 		}
 	}
