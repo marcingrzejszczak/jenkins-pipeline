@@ -112,6 +112,7 @@ dsl.job("${projectName}-build") {
 	scm {
 		git {
 			remote {
+				name('origin')
 				url(fullGitRepo)
 				branch('master')
 				credentials(gitCredentialsId)
@@ -384,6 +385,7 @@ dsl.job("${projectName}-prod-env-deploy") {
 	scm {
 		git {
 			remote {
+				name('origin')
 				url(fullGitRepo)
 				branch('dev/${PIPELINE_VERSION}')
 			}
