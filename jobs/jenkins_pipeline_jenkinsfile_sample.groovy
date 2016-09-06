@@ -30,7 +30,7 @@ dsl.pipelineJob('jenkins-pipeline-jenkinsfile-sample') {
 										string(defaultValue: '0.0.1.M1', description: 'Artifact Version for Eureka used by tests', name: 'EUREKA_VERSION'),
 										string(defaultValue: 'com.example.eureka', description: 'Group Id for Stub Runner used by tests', name: 'STUBRUNNER_GROUP_ID'),
 										string(defaultValue: 'github-analytics-stub-runner-boot', description: 'Artifact Id for Stub Runner used by tests', name: 'STUBRUNNER_ARTIFACT_ID'),
-										string(defaultValue: '0.0.1.M1', description: 'Artifact Version for Stub Runner used by tests', name: 'STUBRUNNER_VERSION')]),
+										string(defaultValue: '0.0.1.M1', description: 'Artifact Version for Stub Runner used by tests', name: 'STUBRUNNER_VERSION'),
 										string(defaultValue: '${pipelineVersion}', description: 'Pipeline version', name: 'PIPELINE_VERSION')]),
 										pipelineTriggers([])]
 
