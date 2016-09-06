@@ -32,10 +32,23 @@ import javaposse.jobdsl.dsl.DslFactory
 	`-Dhudson.model.ParametersAction.safeParameters=[comma-separated list]`
 	to whitelist specific parameter names, even though it represents a security breach
 
+//  ======= GLOBAL =======
+// You need to pass the following as ENV VARS in Mask Passwords section
+	cfTestUsername = '${CF_TEST_USERNAME}'
+	cfTestPassword = '${CF_TEST_PASSWORD}'
+	cfTestOrg = '${CF_TEST_ORG}'
+	cfTestSpace = '${CF_TEST_SPACE}'
+	cfStageUsername = '${CF_STAGE_USERNAME}'
+	cfStagePassword = '${CF_STAGE_PASSWORD}'
+	cfStageOrg = '${CF_STAGE_ORG}'
+	cfStageSpace = '${CF_STAGE_SPACE}'
+	cfProdUsername = '${CF_PROD_USERNAME}'
+	cfProdPassword = '${CF_PROD_PASSWORD}'
+	cfProdOrg = '${CF_PROD_ORG}'
+	cfProdSpace = '${CF_PROD_SPACE}'
+	repoWithJarsEnvVar = '${REPO_WITH_JARS}'
+
 	TODO: TO develop
-	- convert all groovy functions into bash functions
-	- move the functions to src/main/bash and write bash tests
-	- resolve group / artifact / version ids from Maven instead of passing them
 	- perform blue green deployment
 	- implement the complete step
 	- add tests for StubRunner + Eureka
@@ -44,21 +57,6 @@ import javaposse.jobdsl.dsl.DslFactory
 DslFactory dsl = this
 
 //  ======= GLOBAL =======
-// You need to pass the following as ENV VARS in Mask Passwords section
-String cfTestUsername = '${CF_TEST_USERNAME}'
-String cfTestPassword = '${CF_TEST_PASSWORD}'
-String cfTestOrg = '${CF_TEST_ORG}'
-String cfTestSpace = '${CF_TEST_SPACE}'
-String cfStageUsername = '${CF_STAGE_USERNAME}'
-String cfStagePassword = '${CF_STAGE_PASSWORD}'
-String cfStageOrg = '${CF_STAGE_ORG}'
-String cfStageSpace = '${CF_STAGE_SPACE}'
-String cfProdUsername = '${CF_PROD_USERNAME}'
-String cfProdPassword = '${CF_PROD_PASSWORD}'
-String cfProdOrg = '${CF_PROD_ORG}'
-String cfProdSpace = '${CF_PROD_SPACE}'
-String repoWithJarsEnvVar = '${REPO_WITH_JARS}'
-
 // Adjust this to be in accord with your installations
 String jdkVersion = 'jdk8'
 //  ======= GLOBAL =======
