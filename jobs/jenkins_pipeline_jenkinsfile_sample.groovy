@@ -22,7 +22,7 @@ dsl.pipelineJob('jenkins-pipeline-jenkinsfile-sample') {
 			script("""
 			node {
 				stage 'Build and Upload'
-
+				String PIPELINE_VERSION = ${pipelineVersion}
 				properties [[\$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
 							parameters([booleanParam(defaultValue: false, description: 'If Eureka & StubRunner & CF binaries should be redownloaded if already present', name: 'REDOWNLOAD_INFRA'),
 										booleanParam(defaultValue: false, description: 'If Eureka & StubRunner binaries should be redeployed if already present', name: 'REDEPLOY_INFRA'),
