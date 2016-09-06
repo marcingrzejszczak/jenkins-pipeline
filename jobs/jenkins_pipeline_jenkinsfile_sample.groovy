@@ -22,7 +22,6 @@ dsl.pipelineJob('jenkins-pipeline-jenkinsfile-sample') {
 			script("""
 			node {
 				stage 'Build and Upload'
-				String PIPELINE_VERSION = ${pipelineVersion}
 				properties [[\$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
 							parameters([booleanParam(defaultValue: false, description: 'If Eureka & StubRunner & CF binaries should be redownloaded if already present', name: 'REDOWNLOAD_INFRA'),
 										booleanParam(defaultValue: false, description: 'If Eureka & StubRunner binaries should be redeployed if already present', name: 'REDEPLOY_INFRA'),
@@ -32,6 +31,7 @@ dsl.pipelineJob('jenkins-pipeline-jenkinsfile-sample') {
 										string(defaultValue: 'com.example.eureka', description: 'Group Id for Stub Runner used by tests', name: 'STUBRUNNER_GROUP_ID'),
 										string(defaultValue: 'github-analytics-stub-runner-boot', description: 'Artifact Id for Stub Runner used by tests', name: 'STUBRUNNER_ARTIFACT_ID'),
 										string(defaultValue: '0.0.1.M1', description: 'Artifact Version for Stub Runner used by tests', name: 'STUBRUNNER_VERSION')]),
+										string(defaultValue: '${pipelineVersion}', description: 'Pipeline version', name: 'PIPELINE_VERSION')]),
 										pipelineTriggers([])]
 
 				checkout([\$class: 'GitSCM', branches: [[name: '*/master']],
