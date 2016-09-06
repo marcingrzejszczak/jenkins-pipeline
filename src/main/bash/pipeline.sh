@@ -206,3 +206,13 @@ function extractVersionFromProdTag() {
     LAST_PROD_VERSION=${tag#prod/}
     echo ${LAST_PROD_VERSION}
 }
+
+function retrieveGroupId() {
+    local result=$( ./mvnw org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.groupId |grep -Ev '(^\[|Download\w+:)' )
+    echo "${result}"
+}
+
+function retrieveArtifactId() {
+    local result=$( ./mvnw org.apache.maven.plugins:maven-help-plugin:2.2:evaluate -Dexpression=project.artifactId |grep -Ev '(^\[|Download\w+:)' )
+    echo "${result}"
+}
