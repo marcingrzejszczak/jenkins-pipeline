@@ -50,6 +50,15 @@ space: pcfdev-space
 api: api.local.pcfdev.io
 ----
 
+You'll have to create 3 separate spaces
+
+[source,bash]
+----
+cf create-space pfcdev-test
+cf create-space pfcdev-stage
+cf create-space pfcdev-prod
+----
+
 === Start Docker Compose
 
 Jenkins + Artifactory can be ran locally. To do that just execute

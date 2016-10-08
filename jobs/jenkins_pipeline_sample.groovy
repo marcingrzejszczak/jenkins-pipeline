@@ -410,11 +410,11 @@ class PipelineDefaults {
 		Map<String, String> envs = [:]
 		envs['CF_API_URL'] = variables['CF_API_URL'] ?: 'api.local.pcfdev.io'
 		envs['CF_TEST_ORG'] = variables['CF_TEST_ORG'] ?: 'pcfdev-org'
-		envs['CF_TEST_SPACE'] = variables['CF_TEST_SPACE'] ?: 'pcfdev-space'
+		envs['CF_TEST_SPACE'] = variables['CF_TEST_SPACE'] ?: 'pfcdev-test'
 		envs['CF_STAGE_ORG'] = variables['CF_STAGE_ORG'] ?: 'pcfdev-org'
-		envs['CF_STAGE_SPACE'] = variables['CF_STAGE_SPACE'] ?: 'pcfdev-space'
+		envs['CF_STAGE_SPACE'] = variables['CF_STAGE_SPACE'] ?: 'pfcdev-stage'
 		envs['CF_PROD_ORG'] = variables['CF_PROD_ORG'] ?: 'pcfdev-org'
-		envs['CF_PROD_SPACE'] = variables['CF_PROD_SPACE'] ?: 'pcfdev-space'
+		envs['CF_PROD_SPACE'] = variables['CF_PROD_SPACE'] ?: 'pfcdev-prod'
 		envs['M2_SETTINGS_REPO_ID'] = variables['M2_SETTINGS_REPO_ID'] ?: 'artifactory-local'
 		envs['REPO_WITH_JARS'] = variables['REPO_WITH_JARS'] ?: 'http://localhost:8081/artifactory/libs-release-local'
 		return envs
