@@ -33,7 +33,7 @@ function logInToCf() {
     cf api --skip-ssl-validation "${apiUrl}"
     set +x
     cf login -u "${cfUsername}" -p "${cfPassword}" -o "${cfOrg}" -s "${cfSpace}"
-
+    set -x
 }
 
 function deployRabbitMqToCf() {

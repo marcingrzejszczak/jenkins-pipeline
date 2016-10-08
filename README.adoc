@@ -55,8 +55,11 @@ You'll have to create 3 separate spaces
 [source,bash]
 ----
 cf create-space pcfdev-test
+cf set-space-role user pcfdev-org pcfdev-test SpaceDeveloper
 cf create-space pcfdev-stage
+cf set-space-role user pcfdev-org pcfdev-stage SpaceDeveloper
 cf create-space pcfdev-prod
+cf set-space-role user pcfdev-org pcfdev-prod SpaceDeveloper
 ----
 
 === Start Docker Compose
