@@ -24,6 +24,8 @@ PipelineDefaults defaults = new PipelineDefaults(binding.variables)
 String pipelineVersion = '''1.0.0.M1-${GROOVY,script ="new Date().format('yyMMdd_HHmmss')"}-VERSION'''
 String cronValue = "H H * * 7" //every Sunday - I guess you should run it more often ;)
 String testReports = '**/surefire-reports/*.xml'
+String gitCredentials = binding.variables['GIT_CREDENTIAL_ID'] ?: 'git'
+String jdkVersion = binding.variables['JDK_VERSION'] ?: 'jdk8'
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
@@ -58,14 +60,14 @@ parsedRepos.each {
 			environmentVariables(defaults.defaultEnvVars)
 			parameters(PipelineDefaults.defaultParams())
 		}
-		jdk('${JDK_VERSION}')
+		jdk(jdkVersion)
 		scm {
 			git {
 				remote {
 					name('origin')
 					url(fullGitRepo)
 					branch('master')
-					credentials('${GIT_CREDENTIALS_ID}')
+					credentials(gitCredentials)
 				}
 				extensions {
 					wipeOutWorkspace()
@@ -342,7 +344,7 @@ parsedRepos.each {
 					name('origin')
 					url(fullGitRepo)
 					branch('dev/${PIPELINE_VERSION}')
-					credentials('${GIT_CREDENTIALS_ID}')
+					credentials(gitCredentials)
 				}
 			}
 		}
@@ -412,8 +414,6 @@ class PipelineDefaults {
 		envs['CF_PROD_SPACE'] = variables['CF_PROD_SPACE'] ?: 'pcfdev-space'
 		envs['M2_SETTINGS_REPO_ID'] = variables['M2_SETTINGS_REPO_ID'] ?: 'artifactory-local'
 		envs['REPO_WITH_JARS'] = variables['REPO_WITH_JARS'] ?: 'http://localhost:8081/artifactory/libs-release-local'
-		envs['JDK_VERSION'] = variables['JDK_VERSION'] ?: 'jdk8'
-		envs['GIT_CREDENTIAL_ID'] = variables['GIT_CREDENTIAL_ID'] ?: 'git'
 		envs['CF_TEST_CREDENTIAL_ID'] = variables['CF_TEST_CREDENTIAL_ID'] ?: 'cf-test'
 		envs['CF_STAGE_CREDENTIAL_ID'] = variables['CF_STAGE_CREDENTIAL_ID'] ?: 'cf-stage'
 		envs['CF_PROD_CREDENTIAL_ID'] = variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-prod'
