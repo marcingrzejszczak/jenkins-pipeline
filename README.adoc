@@ -78,11 +78,18 @@ space: pcfdev-space
 api: api.local.pcfdev.io
 ----
 
+You can start the PCF dev with more memory
+
+[source,bash]
+----
+cf dev start -m 6144
+----
+
 You'll have to create 3 separate spaces (email admin, pass admin)
 
 [source,bash]
 ----
-cf login -a https://api.local.pcfdev.io --skip-ssl-validation
+cf login -a https://api.local.pcfdev.io --skip-ssl-validation -u admin -p admin -o pcfdev-org
 
 cf create-space pcfdev-test
 cf set-space-role user pcfdev-org pcfdev-test SpaceDeveloper
