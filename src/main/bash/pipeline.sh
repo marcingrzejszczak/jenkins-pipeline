@@ -228,7 +228,11 @@ function runSmokeTests() {
         MAVEN_ARGS="${MAVEN_ARGS} -Dversion=${version}"
     fi
     echo "Running smoke tests"
-    ./mvnw clean install -Psmoke -Dapplication.url="${applicationHost}" -Dstubrunner.url="${stubrunnerHost}" "${MAVEN_ARGS}"
+    if [[ ! -z ${MAVEN_ARGS} ]]; then
+        ./mvnw clean install -Psmoke -Dapplication.url="${applicationHost}" -Dstubrunner.url="${stubrunnerHost}" "${MAVEN_ARGS}"
+    else
+        ./mvnw clean install -Psmoke -Dapplication.url="${applicationHost}" -Dstubrunner.url="${stubrunnerHost}"
+    fi
 }
 
 # Function that executes end to end tests
@@ -236,7 +240,11 @@ function runE2eTests() {
     local applicationHost="${1}"
     local stubrunnerHost="${2}"
     echo "Running smoke tests"
-    ./mvnw clean install -Pe2e -Dapplication.url="${applicationHost}" "${MAVEN_ARGS}"
+    if [[ ! -z ${MAVEN_ARGS} ]]; then
+        ./mvnw clean install -Pe2e -Dapplication.url="${applicationHost}" "${MAVEN_ARGS}"
+    else
+        ./mvnw clean install -Pe2e -Dapplication.url="${applicationHost}"
+    fi
 }
 
 function findLatestProdTag() {
