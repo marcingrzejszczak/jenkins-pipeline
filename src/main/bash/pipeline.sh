@@ -223,10 +223,6 @@ function readTestPropertiesFromFile() {
 function runSmokeTests() {
     local applicationHost="${1}"
     local stubrunnerHost="${2}"
-    local version="${3}"
-    if [[ ! -z ${version} ]]; then
-        MAVEN_ARGS="${MAVEN_ARGS} -Dversion=${version}"
-    fi
     echo "Running smoke tests"
     if [[ ! -z ${MAVEN_ARGS} ]]; then
         ./mvnw clean install -Psmoke -Dapplication.url="${applicationHost}" -Dstubrunner.url="${stubrunnerHost}" "${MAVEN_ARGS}"
