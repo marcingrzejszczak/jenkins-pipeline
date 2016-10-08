@@ -42,10 +42,12 @@ For the other two
 
 You have to build locally and upload their artifacts to Artifactory.
 
-If you're running without Docker Machine:
+If you're running without Docker Machine (e.g. for Github Eureka):
 
 [source,bash]
 ----
+git clone https://github.com/marcingrzejszczak/github-eureka
+cd github-eureka
 ./mvnw clean deploy
 ----
 
@@ -53,6 +55,8 @@ If you're running with Docker Machine (e.g. it's running on 192.168.99.100):
 
 [source,bash]
 ----
+git clone https://github.com/marcingrzejszczak/github-eureka
+cd github-eureka
 ./mvnw clean deploy -Ddistribution.management.release.url=http://192.168.99.100:8081/artifactory/libs-release-local
 ----
 
