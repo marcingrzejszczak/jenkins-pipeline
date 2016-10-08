@@ -1,12 +1,9 @@
 import javaposse.jobdsl.dsl.DslFactory
 import javaposse.jobdsl.dsl.helpers.BuildParametersContext
-
 /*
 	INTRODUCTION:
 
 	TODO BEFORE RUNNING THE PIPELINE
-
-	- define the `Artifact Resolver` Global Configuration. I.e. point to your Nexus / Artifactory
 	- customize the java version
 	- add a Credential to allow pushing the Git tag. Credential is called 'git'
 	- setup `Config File Management` to ensure that every slave has the Maven's settings.xml set up.
@@ -20,63 +17,15 @@ import javaposse.jobdsl.dsl.helpers.BuildParametersContext
 
 DslFactory dsl = this
 
-//  ======= GLOBAL =======
-// You need to pass the following as ENV VARS in Mask Passwords section
-String cfTestUsername = '${CF_TEST_USERNAME}'
-String cfTestPassword = '${CF_TEST_PASSWORD}'
-String cfTestOrg = '${CF_TEST_ORG}'
-String cfTestSpace = '${CF_TEST_SPACE}'
-String cfStageUsername = '${CF_STAGE_USERNAME}'
-String cfStagePassword = '${CF_STAGE_PASSWORD}'
-String cfStageOrg = '${CF_STAGE_ORG}'
-String cfStageSpace = '${CF_STAGE_SPACE}'
-String cfProdUsername = '${CF_PROD_USERNAME}'
-String cfProdPassword = '${CF_PROD_PASSWORD}'
-String cfProdOrg = '${CF_PROD_ORG}'
-String cfProdSpace = '${CF_PROD_SPACE}'
-String repoWithJarsEnvVar = '${REPO_WITH_JARS}'
-String m2SettingsRepoId = '${M2_SETTINGS_REPO_ID}'
-String m2SettingsRepoUrl = '${REPO_WITH_JARS}'
+// These will be taken either from seed or global variables
+PipelineDefaults defaults = new PipelineDefaults(binding.variables)
 
-/*
-The default configuration for Artifactory from Docker
-
-of your ~/.m2/settings.xml
-<server>
-  <id>artifactory-local</id>
-  <username>admin</username>
-  <password>password</password>
-</server>
-
-of env vars:
-M2_SETTINGS_REPO_ID=artifactory-local
-REPO_WITH_JARS=http://localhost:8081/artifactory/libs-release-local
- */
-
-/*
-The default configuration of env vars for PCF Dev.
-
-username: user
-password: pass
-email: user
-org: pcfdev-org
-space: pcfdev-space
-
-CF_API_URL: api.local.pcfdev.io
-
- */
-
-// Adjust this to be in accord with your installations
-String jdkVersion = 'jdk8'
 // Example of a version with date and time in the name
 String pipelineVersion = '''1.0.0.M1-${GROOVY,script ="new Date().format('yyMMdd_HHmmss')"}-VERSION'''
-//  ======= GLOBAL =======
-
-//  ======= PER REPO VARIABLES =======
 String cronValue = "H H * * 7" //every Sunday - I guess you should run it more often ;)
-String gitCredentialsId = binding.variables['GIT_CREDENTIAL_ID'] ?: 'git'
-//  ======= PER REPO VARIABLES =======
+String testReports = '**/surefire-reports/*.xml'
 
+// we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
 		['https://github.com/dsyer/github-analytics',
 		 'github-webhook$https://github.com/marcingrzejszczak/atom-feed',
@@ -105,19 +54,18 @@ parsedRepos.each {
 		}
 		wrappers {
 			deliveryPipelineVersion(pipelineVersion, true)
-			environmentVariables {
-				maskPasswords()
-			}
-			parameters PipelineDefaults.defaultParams()
+			maskPasswords()
+			environmentVariables(defaults.defaultEnvVars)
+			parameters(PipelineDefaults.defaultParams())
 		}
-		jdk(jdkVersion)
+		jdk('${JDK_VERSION}')
 		scm {
 			git {
 				remote {
 					name('origin')
 					url(fullGitRepo)
 					branch('master')
-					credentials(gitCredentialsId)
+					credentials('${GIT_CREDENTIALS_ID}')
 				}
 				extensions {
 					wipeOutWorkspace()
@@ -133,7 +81,7 @@ parsedRepos.each {
 		""")
 		}
 		publishers {
-			archiveJunit('**/surefire-reports/*.xml')
+			archiveJunit(testReports)
 			downstreamParameterized {
 				trigger("${projectName}-test-env-deploy") {
 					triggerWithNoParameters()
@@ -157,7 +105,11 @@ parsedRepos.each {
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 			maskPasswords()
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
+			environmentVariables(defaults.defaultEnvVars)
+			credentialsBinding {
+				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', '${CF_TEST_CREDENTIAL_ID}')
+			}
 		}
 		scm {
 			git {
@@ -192,8 +144,9 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Test', 'Tests on test')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
 			parameters PipelineDefaults.smokeTestParams()
+			environmentVariables(defaults.defaultEnvVars)
 		}
 		scm {
 			git {
@@ -212,7 +165,7 @@ parsedRepos.each {
 		""")
 		}
 		publishers {
-			archiveJunit('**/surefire-reports/*.xml')
+			archiveJunit(testReports)
 			downstreamParameterized {
 				trigger("${projectName}-test-env-rollback-deploy") {
 					parameters {
@@ -229,7 +182,11 @@ parsedRepos.each {
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 			maskPasswords()
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
+			environmentVariables(defaults.defaultEnvVars)
+			credentialsBinding {
+				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', '${CF_TEST_CREDENTIAL_ID}')
+			}
 		}
 		scm {
 			git {
@@ -264,7 +221,7 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Test', 'Tests on test latest prod version')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
 			parameters PipelineDefaults.smokeTestParams()
 			parameters {
 				stringParam('LATEST_PROD_TAG', 'master', 'Latest production tag. If "master" is picked then the step will be ignored')
@@ -287,7 +244,7 @@ parsedRepos.each {
 		""")
 		}
 		publishers {
-			archiveJunit('**/surefire-reports/*.xml') {
+			archiveJunit(testReports) {
 				allowEmptyResults()
 			}
 			buildPipelineTrigger("${projectName}-stage-env-deploy") {
@@ -303,7 +260,10 @@ parsedRepos.each {
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 			maskPasswords()
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
+			credentialsBinding {
+				usernamePassword('CF_STAGE_USERNAME', 'CF_STAGE_PASSWORD', '${CF_STAGE_CREDENTIAL_ID}')
+			}
 		}
 		scm {
 			git {
@@ -335,8 +295,9 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Stage', 'End to end tests on stage')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
 			parameters PipelineDefaults.smokeTestParams()
+			environmentVariables(defaults.defaultEnvVars)
 		}
 		scm {
 			git {
@@ -355,7 +316,7 @@ parsedRepos.each {
 		""")
 		}
 		publishers {
-			archiveJunit('**/surefire-reports/*.xml')
+			archiveJunit(testReports)
 			buildPipelineTrigger("${projectName}-prod-env-deploy") {
 				parameters {
 					currentBuild()
@@ -369,7 +330,11 @@ parsedRepos.each {
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 			maskPasswords()
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
+			environmentVariables(defaults.defaultEnvVars)
+			credentialsBinding {
+				usernamePassword('CF_PROD_USERNAME', 'CF_PROD_PASSWORD', '${CF_PROD_CREDENTIAL_ID}')
+			}
 		}
 		scm {
 			git {
@@ -377,7 +342,7 @@ parsedRepos.each {
 					name('origin')
 					url(fullGitRepo)
 					branch('dev/${PIPELINE_VERSION}')
-					credentials(gitCredentialsId)
+					credentials('${GIT_CREDENTIALS_ID}')
 				}
 			}
 		}
@@ -409,7 +374,8 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Prod', 'Complete switch over')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			parameters PipelineDefaults.defaultParams()
+			parameters(PipelineDefaults.defaultParams())
+			environmentVariables(defaults.defaultEnvVars)
 		}
 		steps {
 			shell("""#!/bin/bash
@@ -425,8 +391,34 @@ parsedRepos.each {
 
 /**
  * A helper class to provide delegation for Closures. That way your IDE will help you in defining parameters.
+ * Also it contains the default env vars setting
  */
 class PipelineDefaults {
+
+	final Map<String, String> defaultEnvVars
+
+	PipelineDefaults(Map<String, String> variables) {
+		this.defaultEnvVars = defaultEnvVars(variables)
+	}
+
+	private Map<String, String> defaultEnvVars(Map<String, String> variables) {
+		Map<String, String> envs = [:]
+		envs['CF_API_URL'] = variables['CF_API_URL'] ?: 'api.local.pcfdev.io'
+		envs['CF_TEST_ORG'] = variables['CF_TEST_ORG'] ?: 'pcfdev-org'
+		envs['CF_TEST_SPACE'] = variables['CF_TEST_SPACE'] ?: 'pcfdev-space'
+		envs['CF_STAGE_ORG'] = variables['CF_STAGE_ORG'] ?: 'pcfdev-org'
+		envs['CF_STAGE_SPACE'] = variables['CF_STAGE_SPACE'] ?: 'pcfdev-space'
+		envs['CF_PROD_ORG'] = variables['CF_PROD_ORG'] ?: 'pcfdev-org'
+		envs['CF_PROD_SPACE'] = variables['CF_PROD_SPACE'] ?: 'pcfdev-space'
+		envs['M2_SETTINGS_REPO_ID'] = variables['M2_SETTINGS_REPO_ID'] ?: 'artifactory-local'
+		envs['REPO_WITH_JARS'] = variables['REPO_WITH_JARS'] ?: 'http://localhost:8081/artifactory/libs-release-local'
+		envs['JDK_VERSION'] = variables['JDK_VERSION'] ?: 'jdk8'
+		envs['GIT_CREDENTIAL_ID'] = variables['GIT_CREDENTIAL_ID'] ?: 'git'
+		envs['CF_TEST_CREDENTIAL_ID'] = variables['CF_TEST_CREDENTIAL_ID'] ?: 'cf-test'
+		envs['CF_STAGE_CREDENTIAL_ID'] = variables['CF_STAGE_CREDENTIAL_ID'] ?: 'cf-stage'
+		envs['CF_PROD_CREDENTIAL_ID'] = variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-prod'
+		return envs
+	}
 
 	protected static Closure context(@DelegatesTo(BuildParametersContext) Closure params) {
 		params.resolveStrategy = Closure.DELEGATE_FIRST

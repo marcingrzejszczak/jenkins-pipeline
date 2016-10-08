@@ -11,10 +11,16 @@ factory.job('jenkins-pipeline-seed') {
             branch('master')
         }
     }
+    wrappers {
+        parameters {
+            stringParam('REPOS', '', "Provide a comma separated list of repos. " +
+                    "If nothing is passed then the default repos will be used")
+        }
+    }
     steps {
         gradle("clean build")
         dsl {
-            external('jobs/*.groovy')
+            external('jobs/jenkins_pipeline_sample*.groovy')
             removeAction('DISABLE')
             removeViewAction('DELETE')
             ignoreExisting(false)

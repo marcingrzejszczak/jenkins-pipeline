@@ -14,10 +14,12 @@ The projects that take part in the whole setup are:
 - Fork repos
 - Start PCF Dev (if you don't want to use an existing one)
 - Start Docker Compose with Jenkins + Artifactory
-- Setup Jenkins global config
-- Add Jenkins credentials for Github
-- Add `settings.xml` for Jenkins' master
-- Seed job with REPOS to forked projects
+- Setup Jenkins env vars (if you want to use the demo defaults and you're using Docker Machine
+just check out the section on how to update the URL to Artifactory)
+- Setup Jenkins miscs (JDK installation, Groovy macro processing etc.)
+- Setup Jenkins credentials
+- Add `settings.xml` for Jenkins' master (you can skip this if you want to use our defaults)
+- Modify the seed job
 
 === Fork repos
 
@@ -36,6 +38,18 @@ TIP: You can skip this step if you have CF installed already
 
 You have to download and start PCF Dev. https://pivotal.io/platform/pcf-tutorials/getting-started-with-pivotal-cloud-foundry-dev/install-pcf-dev[A link how to do it is available here.]
 
+The default credentials when using PCF Dev are:
+
+[source,bash]
+----
+username: user
+password: pass
+email: user
+org: pcfdev-org
+space: pcfdev-space
+api: api.local.pcfdev.io
+----
+
 === Start Docker Compose
 
 Jenkins + Artifactory can be ran locally. To do that just execute
@@ -44,57 +58,117 @@ Jenkins + Artifactory can be ran locally. To do that just execute
 
 Then Jenkins will be running on port `8080` and Artifactory `8081`.
 
-=== Setup Jenkins global config
+=== Setup Jenkins env vars
 
+TIP: If you want to only play around with the demo that we've prepared
+you can skip this section and use our defaults
 
-==== Global envs
+IMPORTANT: If you're using a docker-machine then for sure you have to update
+ the `REPO_WITH_JARS` to point to your Docker Machine address e.g. `192.168.99.100`
+ instead of `localhost`
 
-You have to add env vars (go to configure Jenkins -> Global Properties) for the following
- properties (the defaults are for PCF Dev):
+You need to be able to pass the environment variables to your jobs. Those
+env vars are:
 
 [frame="topbot",options="header,footer"]
 |======================
-|Property Name  | Property Description | PCF Dev value
-|CF_TEST_ORG    | Name of the org for the test env |
-|CF_TEST_SPACE  | Name of the space for the test env |
-|CF_STAGE_ORG   | Name of the org for the stage env |
-|CF_STAGE_SPACE | Name of the space for the stage env |
-|CF_PROD_ORG   | Name of the org for the prod env |
-|CF_PROD_SPACE | Name of the space for the prod env |
+|Property Name  | Property Description | Default value
+|CF_API_URL | The URL to the CF Api | api.local.pcfdev.io
+|CF_TEST_ORG    | Name of the org for the test env | pcfdev-org
+|CF_TEST_SPACE  | Name of the space for the test env | pcfdev-space
+|CF_STAGE_ORG   | Name of the org for the stage env | pcfdev-org
+|CF_STAGE_SPACE | Name of the space for the stage env | pcfdev-space
+|CF_PROD_ORG   | Name of the org for the prod env | pcfdev-org
+|CF_PROD_SPACE | Name of the space for the prod env | pcfdev-space
 |REPO_WITH_JARS | URL to repo with the deployed jars | http://localhost:8081/artifactory/libs-release-local
 |M2_SETTINGS_REPO_ID | The id of server from Maven settings.xml | artifactory-local
+|JDK_VERSION | The name of the JDK installation | jdk8
 |======================
+
+There's a number of ways to achieve it!
+
+==== Global envs
+
+You can add env vars (go to configure Jenkins -> Global Properties) for the following
+ properties (the defaults are for PCF Dev):
 
 Example screen:
 
 image::docs/env_vars.png[]
 
-==== Masked passwords
+==== Seed variables
 
-Provide masked passwords in a similar manner (the defaults are for PCF Dev):
+Another approach is to run the seed job with parameters / env vars. Whatever
+you set will be parsed by the seed job and passed to the generated Jenkins
+jobs.
 
-[frame="topbot",options="header,footer"]
-|======================
-|Property Name  | Property Description | PCF Dev value
-|CF_TEST_USERNAME    | Username for test env for Cloud Foundry | user
-|CF_TEST_PASSWORD  | Password for test env for Cloud Foundry | pass
-|CF_STAGE_USERNAME   | Username for test env for Cloud Foundry | user
-|CF_STAGE_PASSWORD | Password for test env for Cloud Foundry | pass
-|CF_PROD_USERNAME   | Username for test env for Cloud Foundry | user
-|CF_PROD_PASSWORD | Password for test env for Cloud Foundry | pass
-|======================
+TIP: This is very useful when the repos you want to build differ. E.g. use
+different JDK. Then some seeds can set the `JDK_VERSION` param to one version
+of Java installation and the others to another one.
 
 Example screen:
 
-image::docs/masked_env_vars.png[]
+TODO: Add a screen
 
-==== Additional setup
+=== Additional setup
 
-Enable Groovy Token Macro Processing to allow generation of Pipeline Version
+==== Enable Groovy Token Macro Processing
+
+you need this to allow generation of Pipeline Version
 
 image::docs/groovy_token.png[]
 
-=== Add Jenkins credentials for Github
+==== Provide your JDK version
+
+- by default we assume that you have jdk with id `jdk8` configured
+- if you want a different one just override `JDK_VERSION` env var and point to the proper one
+
+=== Add Jenkins credentials for GitHub
+
+The scripts will need to access the credentials for Cloud Foundry access.
+Additionally there is one that is required in order to tag the repo.
+
+In order for the scripts to find the credentials you have to pass the IDs
+of the stored credentials. Below you can find the list of env vars that you
+can set in order to find the proper credential. There are of course
+some defaults too
+
+[frame="topbot",options="header,footer"]
+|======================
+|Property Name  | Property Description | Default value
+|GIT_CREDENTIAL_ID    | Credential used to tag a git repo | git
+|CF_TEST_CREDENTIAL_ID  | Credential for CF Test env access | cf-test
+|CF_STAGE_CREDENTIAL_ID   | Credential for CF Stage env access | cf-stage
+|CF_PROD_CREDENTIAL_ID | Credential for CF Prod env access | cf-prod
+|======================
+
+Below you can find instructions on how to set a credential.
+
+TODO: Add screens
+
+=== Setup settings.xml for Maven deployment
+
+TIP: If you want to use the default connection to the Docker version
+of Artifactory you can skip this step
+
+So that `./mvnw deploy` works with Artifactory from Docker we're
+already copying the missing `settings.xml` file for you. It looks like this:
+
+[source,bash]
+----
+<server>
+  <id>artifactory-local</id>
+  <username>admin</username>
+  <password>password</password>
+</server>
+----
+
+If you want to use your own version of Artifactory / Nexus you have to update
+the file (it's in `seed/settings.xml`).
+
+=== Modify the seed job
+
+We already create the seed job for you but you'll have to modify it.
 
 == FAQ
 
