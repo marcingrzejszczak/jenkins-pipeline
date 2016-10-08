@@ -49,17 +49,19 @@ function deployRabbitMqToCf() {
 function deployAndRestartAppWithName() {
     local appName="${1}"
     local jarName="${2}"
+    local env="${3}"
     echo "Deploying and restarting app with name [${appName}] and jar name [${jarName}]"
-    deployAppWithName "${appName}" "${jarName}" 'true'
+    deployAppWithName "${appName}" "${jarName}" "${env}" 'true'
     restartApp "${appName}"
 }
 
 function deployAndRestartAppWithNameForSmokeTests() {
     local appName="${1}"
     local jarName="${2}"
+    local env="${3:-test}"
     local lowerCaseAppName=$( echo "${appName}" | tr '[:upper:]' '[:lower:]' )
     echo "Deploying and restarting app with name [${appName}] and jar name [${jarName}]"
-    deployAppWithName "${appName}" "${jarName}" 'true'
+    deployAppWithName "${appName}" "${jarName}" "${env}" 'true'
     setEnvVar "${lowerCaseAppName}" 'spring.profiles.active' "cloud,smoke"
     restartApp "${appName}"
 }
@@ -74,11 +76,16 @@ function appHost() {
 function deployAppWithName() {
     local appName="${1}"
     local jarName="${2}"
-    local useManifest="${3:-false}"
+    local env="${3}"
+    local useManifest="${4:-false}"
     local manifestOption=$( if [[ "${useManifest}" == "false" ]] ; then echo "--no-manifest"; else echo "" ; fi )
     local lowerCaseAppName=$( echo "${appName}" | tr '[:upper:]' '[:lower:]' )
+    local hostname="${lowerCaseAppName}"
+    if [[ ${env} != "prod" ]]; then
+        hostname="${hostname}-${env}"
+    fi
     echo "Deploying app with name [${lowerCaseAppName}]"
-    cf push "${lowerCaseAppName}" -m 1024m -i 1 -p target/${jarName}.jar -n ${lowerCaseAppName} --no-start -b https://github.com/cloudfoundry/java-buildpack.git#v3.8.1 ${manifestOption}
+    cf push "${lowerCaseAppName}" -m 1024m -i 1 -p "target/${jarName}.jar" -n "${hostname}" --no-start -b https://github.com/cloudfoundry/java-buildpack.git#v3.8.1 "${manifestOption}"
     APPLICATION_DOMAIN="$( appHost ${lowerCaseAppName} )"
     echo "Determined that application_domain for [${lowerCaseAppName}] is [${APPLICATION_DOMAIN}]"
     setEnvVar "${lowerCaseAppName}" 'APPLICATION_DOMAIN' "${APPLICATION_DOMAIN}"
@@ -111,9 +118,10 @@ function deployEureka() {
     local redeploy="${1}"
     local jarName="${2}"
     local appName="${3:-github-eureka}"
-    echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${appName}]"
+    local env="${4}"
+    echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${appName}], env [${env}]"
     if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
-        deployAppWithName "${appName}" "${jarName}"
+        deployAppWithName "${appName}" "${jarName}" "${env}"
         restartApp "${appName}"
         createServiceWithName "${appName}"
     else
@@ -124,12 +132,13 @@ function deployEureka() {
 function deployStubRunnerBoot() {
     local redeploy="${1}"
     local jarName="${2}"
-    local eurekaService="${3:-github-eureka}"
-    local rabbitmqService="${4:-github-rabbitmq}"
-    local stubRunnerName="${5:-stubrunner}"
+    local env="${3}"
+    local eurekaService="${4:-github-eureka}"
+    local rabbitmqService="${5:-github-rabbitmq}"
+    local stubRunnerName="${6:-stubrunner}"
     echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${stubRunnerName}], eureka [${eurekaService}], rabbitmq [${rabbitmqService}]"
     if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
-        deployAppWithName "${stubRunnerName}" "${jarName}"
+        deployAppWithName "${stubRunnerName}" "${env}" "${jarName}"
         local mavenProp="$( extractMavenProperty "stubrunner.ids" )"
         setEnvVar "${stubRunnerName}" "stubrunner.ids" "${mavenProp}"
         bindService "${eurekaService}" "${stubRunnerName}"
