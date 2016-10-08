@@ -54,9 +54,9 @@ You'll have to create 3 separate spaces
 
 [source,bash]
 ----
-cf create-space pfcdev-test
-cf create-space pfcdev-stage
-cf create-space pfcdev-prod
+cf create-space pcfdev-test
+cf create-space pcfdev-stage
+cf create-space pcfdev-prod
 ----
 
 === Start Docker Compose
