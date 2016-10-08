@@ -9,6 +9,10 @@ MAINTAINER Marcin Grzejszczak <mgrzejszczak@pivotal.io>
 COPY seed/init.groovy /usr/share/jenkins/ref/init.groovy
 COPY seed/jenkins_pipeline.groovy /usr/share/jenkins/jenkins_pipeline.groovy
 
+# INSTALLING JDK8 (SO THAT THE USER DOESN'T HAVE TO DO IT)
+# TODO: CONSIDER ALL THE LICENSING
+
+
 USER jenkins
 
 COPY seed/settings.xml /home/jenkins/.m2/settings.xml

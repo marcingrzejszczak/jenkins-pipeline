@@ -99,6 +99,19 @@ cf create-space pcfdev-prod
 cf set-space-role user pcfdev-org pcfdev-prod SpaceDeveloper
 ----
 
+IMPORTANT: Most likely you will run out of memory so when reaching the stage
+environment it's good to kill all apps on test. You can do it like this:
+
+E.g. for `github-webhook` app
+
+[source,bash]
+----
+cf target -o pcfdev-org -s pcfdev-test
+cf stop github-webhook
+cf stop github-eureka
+cf stop stubrunner
+----
+
 === Start Docker Compose
 
 Jenkins + Artifactory can be ran locally. To do that just execute
@@ -254,6 +267,19 @@ E.g. for `REPOS` equal to:
 
 will result in the creation of pipelines with root names `foo` for `github-analytics`
 and `bar` for `atom-feed`.
+
+=== I've ran out of resources!!
+
+When deploying the app to stage or prod you can get an exception `Insufficient resources`. The way to
+ solve it is to kill some apps from test / stage env. To achieve that just call
+
+[source,bash]
+----
+cf target -o pcfdev-org -s pcfdev-test
+cf stop github-webhook
+cf stop github-eureka
+cf stop stubrunner
+----
 
 == How to build it
 
