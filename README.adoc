@@ -185,6 +185,10 @@ image::docs/groovy_token.png[]
 - by default we assume that you have jdk with id `jdk8` configured
 - if you want a different one just override `JDK_VERSION` env var and point to the proper one
 
+TIP: The docker image comes in with Java installed at `/usr/lib/jvm/java-8-openjdk-amd64`.
+You can go to `Global Tools` and create a JDK with `jdk8` id and JAVA_HOME
+ pointing to `/usr/lib/jvm/java-8-openjdk-amd64`
+
 === Add Jenkins credentials for GitHub
 
 The scripts will need to access the credentials for Cloud Foundry access.
