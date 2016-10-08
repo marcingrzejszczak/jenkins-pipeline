@@ -75,7 +75,7 @@ function deployAppWithName() {
     local appName="${1}"
     local jarName="${2}"
     local useManifest="${3:-false}"
-    local manifestOption=$( if [[ "${useManifest}" == "false" ]] ; then echo ""; else echo "--no-manifest" ; fi )
+    local manifestOption=$( if [[ "${useManifest}" == "false" ]] ; then echo "--no-manifest"; else echo "" ; fi )
     local lowerCaseAppName=$( echo "${appName}" | tr '[:upper:]' '[:lower:]' )
     echo "Deploying app with name [${lowerCaseAppName}]"
     cf push "${lowerCaseAppName}" -m 1024m -i 1 -p target/${jarName}.jar -n ${lowerCaseAppName} --no-start -b https://github.com/cloudfoundry/java-buildpack.git#v3.8.1 ${manifestOption}
