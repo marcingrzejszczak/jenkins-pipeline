@@ -30,7 +30,31 @@ There are 4 apps that are composing the pipeline
   - https://github.com/marcingrzejszczak/github-eureka[Github Eureka]
   - https://github.com/marcingrzejszczak/github-analytics-stub-runner-boot[Github Stub Runner Boot]
 
-You need to fork them. That's because only then will your user be able to tag and push the tag to repo.
+You need to fork only these. That's because only then will your user be able to tag and push the tag to repo.
+
+  - https://github.com/marcingrzejszczak/atom-feed[Github Webhook]
+  - https://github.com/dsyer/github-analytics/[Github Analytics]
+
+For the other two
+
+  - https://github.com/marcingrzejszczak/github-eureka[Github Eureka]
+  - https://github.com/marcingrzejszczak/github-analytics-stub-runner-boot[Github Stub Runner Boot]
+
+You have to build locally and upload their artifacts to Artifactory.
+
+If you're running without Docker Machine:
+
+[source,bash]
+----
+./mvnw clean deploy
+----
+
+If you're running with Docker Machine (e.g. it's running on 192.168.99.100):
+
+[source,bash]
+----
+./mvnw clean deploy -Ddistribution.management.release.url=http://192.168.99.100:8081/artifactory/libs-release-local
+----
 
 === Start PCF Dev
 
@@ -50,10 +74,12 @@ space: pcfdev-space
 api: api.local.pcfdev.io
 ----
 
-You'll have to create 3 separate spaces
+You'll have to create 3 separate spaces (email admin, pass admin)
 
 [source,bash]
 ----
+cf login -a https://api.local.pcfdev.io --skip-ssl-validation
+
 cf create-space pcfdev-test
 cf set-space-role user pcfdev-org pcfdev-test SpaceDeveloper
 cf create-space pcfdev-stage
