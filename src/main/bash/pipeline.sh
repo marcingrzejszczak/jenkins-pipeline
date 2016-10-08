@@ -59,7 +59,7 @@ function deployAndRestartAppWithNameForSmokeTests() {
     local jarName="${2}"
     local env="${3:-test}"
     local lowerCaseAppName=$( echo "${appName}" | tr '[:upper:]' '[:lower:]' )
-    echo "Deploying and restarting app with name [${appName}] and jar name [${jarName}]"
+    echo "Deploying and restarting app with name [${appName}] and jar name [${jarName}] and env [${env}]"
     deployAppWithName "${appName}" "${jarName}" "${env}" 'true'
     setEnvVar "${lowerCaseAppName}" 'spring.profiles.active' "cloud,smoke"
     restartApp "${appName}"
@@ -83,7 +83,7 @@ function deployAppWithName() {
     if [[ ${env} != "prod" ]]; then
         hostname="${hostname}-${env}"
     fi
-    echo "Deploying app with name [${lowerCaseAppName}]"
+    echo "Deploying app with name [${lowerCaseAppName}], env [${env}] with manifest [${useManifest}] and host [${hostname}]"
     if [[ ! -z "${manifestOption}" ]]; then
         cf push "${lowerCaseAppName}" -m 1024m -i 1 -p "target/${jarName}.jar" -n "${hostname}" --no-start -b https://github.com/cloudfoundry/java-buildpack.git#v3.8.1 ${manifestOption}
     else
