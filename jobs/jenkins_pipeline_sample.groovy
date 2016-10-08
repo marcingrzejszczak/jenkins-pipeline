@@ -26,6 +26,9 @@ String cronValue = "H H * * 7" //every Sunday - I guess you should run it more o
 String testReports = '**/surefire-reports/*.xml'
 String gitCredentials = binding.variables['GIT_CREDENTIAL_ID'] ?: 'git'
 String jdkVersion = binding.variables['JDK_VERSION'] ?: 'jdk8'
+String cfTestCredentialId = binding.variables['CF_TEST_CREDENTIAL_ID'] ?: 'cf-test'
+String cfStageCredentialId = binding.variables['CF_STAGE_CREDENTIAL_ID'] ?: 'cf-stage'
+String cfProdCredentialId = binding.variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-prod'
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
@@ -110,7 +113,7 @@ parsedRepos.each {
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
-				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', '${CF_TEST_CREDENTIAL_ID}')
+				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', cfTestCredentialId)
 			}
 		}
 		scm {
@@ -187,7 +190,7 @@ parsedRepos.each {
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
-				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', '${CF_TEST_CREDENTIAL_ID}')
+				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', cfTestCredentialId)
 			}
 		}
 		scm {
@@ -264,7 +267,7 @@ parsedRepos.each {
 			maskPasswords()
 			parameters(PipelineDefaults.defaultParams())
 			credentialsBinding {
-				usernamePassword('CF_STAGE_USERNAME', 'CF_STAGE_PASSWORD', '${CF_STAGE_CREDENTIAL_ID}')
+				usernamePassword('CF_STAGE_USERNAME', 'CF_STAGE_PASSWORD', cfStageCredentialId)
 			}
 		}
 		scm {
@@ -335,7 +338,7 @@ parsedRepos.each {
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
-				usernamePassword('CF_PROD_USERNAME', 'CF_PROD_PASSWORD', '${CF_PROD_CREDENTIAL_ID}')
+				usernamePassword('CF_PROD_USERNAME', 'CF_PROD_PASSWORD', cfProdCredentialId)
 			}
 		}
 		scm {
@@ -414,9 +417,6 @@ class PipelineDefaults {
 		envs['CF_PROD_SPACE'] = variables['CF_PROD_SPACE'] ?: 'pcfdev-space'
 		envs['M2_SETTINGS_REPO_ID'] = variables['M2_SETTINGS_REPO_ID'] ?: 'artifactory-local'
 		envs['REPO_WITH_JARS'] = variables['REPO_WITH_JARS'] ?: 'http://localhost:8081/artifactory/libs-release-local'
-		envs['CF_TEST_CREDENTIAL_ID'] = variables['CF_TEST_CREDENTIAL_ID'] ?: 'cf-test'
-		envs['CF_STAGE_CREDENTIAL_ID'] = variables['CF_STAGE_CREDENTIAL_ID'] ?: 'cf-stage'
-		envs['CF_PROD_CREDENTIAL_ID'] = variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-prod'
 		return envs
 	}
 
