@@ -43,6 +43,28 @@ For the other two
 
 You have to build locally and upload their artifacts to Artifactory.
 
+==== Set up your local Maven to work with Artifactory
+
+First, you have to ensure that this section is present under your `~/.m2/settings.xml`
+
+[source,xml]
+----
+<server>
+  <id>artifactory-local</id>
+  <username>admin</username>
+  <password>password</password>
+</server>
+----
+
+If you don't have this file just copy the one under `seed/settings.xml` or copy paste it from below
+
+[source,xml]
+----
+include::seed/settings.xml[]
+----
+
+==== Deploy the infra JARs
+
 If you're running without Docker Machine
 
 Github Eureka:
@@ -259,7 +281,7 @@ of Artifactory you can skip this step
 So that `./mvnw deploy` works with Artifactory from Docker we're
 already copying the missing `settings.xml` file for you. It looks like this:
 
-[source,bash]
+[source,xml]
 ----
 <server>
   <id>artifactory-local</id>
