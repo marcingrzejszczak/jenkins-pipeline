@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<server>
-	<id>artifactory-local</id>
-	<username>admin</username>
-	<password>password</password>
-</server>
+<settings>
+	<servers>
+		<server>
+			<id>artifactory-local</id>
+			<username>admin</username>
+			<password>password</password>
+		</server>
+	</servers>
+</settings>
