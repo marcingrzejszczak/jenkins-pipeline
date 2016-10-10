@@ -220,7 +220,7 @@ image::docs/manage_jenkins.png[caption="Step 1: ", title="Click 'Manage Jenkins'
 
 image::docs/global_tool.png[caption="Step 2: ", title="Click 'Global Tool'"]
 
-image::docs/jdk.png[caption="Step 3: ", title="Fill out JDK Installation"]
+image::docs/jdk.png[caption="Step 3: ", title="Fill out JDK Installation with `/usr/lib/jvm/java-8-openjdk-amd64`"]
 
 === Add Jenkins credentials for GitHub
 
