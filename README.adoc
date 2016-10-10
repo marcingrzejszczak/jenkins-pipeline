@@ -240,7 +240,11 @@ To set the default one just follow these steps:
 
 image::docs/manage_jenkins.png[caption="Step 1: ", title="Click 'Manage Jenkins'"]
 
+
+
 image::docs/global_tool.png[caption="Step 2: ", title="Click 'Global Tool'"]
+
+
 
 image::docs/jdk.png[caption="Step 3: ", title="Fill out JDK Installation with `/usr/lib/jvm/java-8-openjdk-amd64`"]
 
@@ -252,26 +256,40 @@ Additionally there is one that is required in order to tag the repo.
 In order for the scripts to find the credentials you have to pass the IDs
 of the stored credentials. Below you can find the list of env vars that you
 can set in order to find the proper credential. There are of course
-some defaults too
+some defaults too.
 
-[frame="topbot",options="header,footer"]
-|======================
-|Property Name  | Property Description | Default value
-|GIT_CREDENTIAL_ID    | Credential used to tag a git repo | git
-|CF_TEST_CREDENTIAL_ID  | Credential for CF Test env access | cf-test
-|CF_STAGE_CREDENTIAL_ID   | Credential for CF Stage env access | cf-stage
-|CF_PROD_CREDENTIAL_ID | Credential for CF Prod env access | cf-prod
-|======================
+You have to set credentials with ids: `cf-test`, `cf-stage`, `cf-prod`, `git`.
 
 Below you can find instructions on how to set a credential (e.g. for `cf-test` credential).
 
 image::docs/credentials_system.png[caption="Step 1: ", title="Click 'Credentials, System'"]
 
+
+
 image::docs/credentials_global.png[caption="Step 2: ", title="Click 'Global Credentials'"]
+
+
 
 image::docs/credentials_add.png[caption="Step 3: ", title="Click 'Add credentials'"]
 
+
+
 image::docs/credentials_example.png[caption="Step 4: ", title="Fill out the user / password and provide the ID (in this example `cf-test`)"]
+
+
+In your scripts we reference the credentials via IDs. These are the defaults for credentials
+
+[frame="topbot",options="header,footer"]
+|======================
+|Property Name  | Property Description | Default value
+|GIT_CREDENTIAL_ID    | Credential ID used to tag a git repo | git
+|CF_TEST_CREDENTIAL_ID  | Credential ID for CF Test env access | cf-test
+|CF_STAGE_CREDENTIAL_ID   | Credential ID for CF Stage env access | cf-stage
+|CF_PROD_CREDENTIAL_ID | Credential ID for CF Prod env access | cf-prod
+|======================
+
+If you already have in your system a credential to for example tag a repo
+you can use it by passing the value of the property `GIT_CREDENTIAL_ID`
 
 === Setup settings.xml for Maven deployment
 
@@ -304,21 +322,41 @@ seed.
 Anyways, to run the demo just provide in the `REPOS` var the comma separated
  list of URLs of the 2 aforementioned forks of `github-webhook` and `github-analytics'.
 
+
+
 image::docs/seed_click.png[caption="Step 1: ", title="Click the 'jenkins-pipeline-seed' job"]
+
+
 
 image::docs/seed_run.png[caption="Step 2: ", title="Click the 'Build with parameters'"]
 
+
+
 image::docs/seed.png[caption="Step 3: ", title="Provide the parameters (you'll have more of them)"]
+
+
 
 image::docs/seed_built.png[caption="Step 4: ", title="This is how the results of seed should look like"]
 
+
+
 image::docs/seed_views.png[caption="Step 5: ", title="Click the 'github-webhook' view"]
+
+
 
 image::docs/pipeline_run.png[caption="Step 6: ", title="Run the pipeline"]
 
-image::docs/pipeline_manual.png[caption="Step 6: ", title="Click the manual step to go to stage (remember about killing the apps on test env)"]
 
-image::docs/pipeline_finished.png[caption="Step 7: ", title="The full pipeline should look like this"]
+
+image::docs/pipeline_run_props.png[caption="Step 7: ", title="You can set some properties (just click 'Build' to proceed) "]
+
+
+
+image::docs/pipeline_manual.png[caption="Step 8: ", title="Click the manual step to go to stage (remember about killing the apps on test env)"]
+
+
+
+image::docs/pipeline_finished.png[caption="Step 9: ", title="The full pipeline should look like this"]
 
 
 
