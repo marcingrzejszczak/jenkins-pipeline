@@ -19,7 +19,8 @@ just check out the section on how to update the URL to Artifactory)
 - Setup Jenkins miscs (JDK installation, Groovy macro processing etc.)
 - Setup Jenkins credentials
 - Add `settings.xml` for Jenkins' master (you can skip this if you want to use our defaults)
-- Modify the seed job
+- Run the seed job
+- Run the `github-webhook` pipeline
 
 === Fork repos
 
@@ -180,7 +181,7 @@ Example screen:
 
 image::docs/env_vars.png[]
 
-==== Seed variables
+==== Seed properties
 
 Another approach is to run the seed job with parameters / env vars. Whatever
 you set will be parsed by the seed job and passed to the generated Jenkins
@@ -192,7 +193,9 @@ of Java installation and the others to another one.
 
 Example screen:
 
-TODO: Add a screen
+image::docs/seed.png[]
+
+In this example we could parametrize the `REPOS` and `REPO_WITH_JARS` params.
 
 === Additional setup
 
@@ -238,9 +241,15 @@ some defaults too
 |CF_PROD_CREDENTIAL_ID | Credential for CF Prod env access | cf-prod
 |======================
 
-Below you can find instructions on how to set a credential.
+Below you can find instructions on how to set a credential (e.g. for `cf-test` credential).
 
-TODO: Add screens
+image::docs/credentials_system.png[caption="Step 1: ", title="Click 'Credentials, System'"]
+
+image::docs/credentials_global.png[caption="Step 2: ", title="Click 'Global Credentials'"]
+
+image::docs/credentials_add.png[caption="Step 3: ", title="Click 'Add credentials'"]
+
+image::docs/credentials_example.png[caption="Step 4: ", title="Fill out the user / password and provide the ID (in this example `cf-test`)"]
 
 === Setup settings.xml for Maven deployment
 
@@ -262,9 +271,45 @@ already copying the missing `settings.xml` file for you. It looks like this:
 If you want to use your own version of Artifactory / Nexus you have to update
 the file (it's in `seed/settings.xml`).
 
-=== Modify the seed job
+=== Run the seed job
 
-We already create the seed job for you but you'll have to modify it.
+We already create the seed job for you but you'll have to run it. When you do
+run it you have to provide some properties. By default we create a seed that
+has all the properties options, but you can delete most of it. If you
+set the properties as global env variables you have to remove them from the
+seed.
+
+Anyways, to run the demo just provide in the `REPOS` var the comma separated
+ list of URLs of the 2 aforementioned forks of `github-webhook` and `github-analytics'.
+
+image::docs/seed_click.png[caption="Step 1: ", title="Click the 'jenkins-pipeline-seed' job"]
+
+image::docs/seed_run.png[caption="Step 2: ", title="Click the 'Build with parameters'"]
+
+image::docs/seed.png[caption="Step 3: ", title="Provide the parameters (you'll have more of them)"]
+
+image::docs/seed_built.png[caption="Step 4: ", title="This is how the results of seed should look like"]
+
+image::docs/seed_views.png[caption="Step 5: ", title="Click the 'github-webhook' view"]
+
+image::docs/pipeline_run.png[caption="Step 6: ", title="Run the pipeline"]
+
+image::docs/pipeline_manual.png[caption="Step 6: ", title="Click the manual step to go to stage (remember about killing the apps on test env)"]
+
+image::docs/pipeline_finished.png[caption="Step 7: ", title="The full pipeline should look like this"]
+
+
+
+=== Run the github-webhook pipeline
+
+We already create the seed job for you but you'll have to run it. When you do
+run it you have to provide some properties. By default we create a seed that
+has all the properties options, but you can delete most of it. If you
+set the properties as global env variables you have to remove them from the
+seed.
+
+Anyways, to run the demo just provide in the `REPOS` var the comma separated
+ list of URLs of the 2 aforementioned forks of `github-webhook` and `github-analytics'.
 
 == FAQ
 
@@ -326,7 +371,7 @@ WARNING: The ran test only checks if your scripts compile.
 Check out the https://github.com/jenkinsci/job-dsl-plugin/wiki/Tutorial---Using-the-Jenkins-Job-DSL[tutorial].
 Provide the link to this repository in your Jenkins installation.
 
-The seed job for Spring Cloud should scan the `jobs/springcloud/*.groovy` files.
+The seed job should scan the `jobs/jenkins_pipeline_sample*.groovy` files.
 
 Remember to add `src/main/groovy` and `src/main/resources` for processing
 
