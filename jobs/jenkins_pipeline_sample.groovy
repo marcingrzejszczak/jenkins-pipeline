@@ -1,14 +1,7 @@
 import javaposse.jobdsl.dsl.DslFactory
 import javaposse.jobdsl.dsl.helpers.BuildParametersContext
+
 /*
-	INTRODUCTION:
-
-	TODO BEFORE RUNNING THE PIPELINE
-	- customize the java version
-	- add a Credential to allow pushing the Git tag. Credential is called 'git'
-	- setup `Config File Management` to ensure that every slave has the Maven's settings.xml set up.
-		Otherwise `./mvnw clean deploy` won't work
-
 	TODO: TO develop
 	- write bash tests
 	- perform blue green deployment
@@ -33,9 +26,7 @@ String cfProdCredentialId = binding.variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-pr
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
 		['https://github.com/dsyer/github-analytics',
-		 'github-webhook$https://github.com/marcingrzejszczak/atom-feed',
-		 'github-stub-runner$https://github.com/marcingrzejszczak/github-analytics-stub-runner-boot',
-		 'https://github.com/marcingrzejszczak/github-eureka'].join(',')
+		 'github-webhook$https://github.com/marcingrzejszczak/atom-feed'].join(',')
 List<String> parsedRepos = repos.split(',')
 parsedRepos.each {
 	List<String> parsedEntry = it.split('\\$')

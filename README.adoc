@@ -42,7 +42,9 @@ For the other two
 
 You have to build locally and upload their artifacts to Artifactory.
 
-If you're running without Docker Machine (e.g. for Github Eureka):
+If you're running without Docker Machine
+
+Github Eureka:
 
 [source,bash]
 ----
@@ -51,12 +53,32 @@ cd github-eureka
 ./mvnw clean deploy
 ----
 
-If you're running with Docker Machine (e.g. it's running on 192.168.99.100):
+Github Stub Runner:
+
+[source,bash]
+----
+git clone https://github.com/marcingrzejszczak/github-analytics-stub-runner-boot
+cd github-analytics-stub-runner-boot
+./mvnw clean deploy
+----
+
+If you're running with Docker Machine (e.g. Docker Machine running on 192.168.99.100):
+
+Github Eureka:
 
 [source,bash]
 ----
 git clone https://github.com/marcingrzejszczak/github-eureka
 cd github-eureka
+./mvnw clean deploy -Ddistribution.management.release.url=http://192.168.99.100:8081/artifactory/libs-release-local
+----
+
+Github Stub Runner:
+
+[source,bash]
+----
+git clone https://github.com/marcingrzejszczak/github-analytics-stub-runner-boot
+cd github-analytics-stub-runner-boot
 ./mvnw clean deploy -Ddistribution.management.release.url=http://192.168.99.100:8081/artifactory/libs-release-local
 ----
 
@@ -82,7 +104,7 @@ You can start the PCF dev with more memory
 
 [source,bash]
 ----
-cf dev start -m 6144
+cf dev start
 ----
 
 You'll have to create 3 separate spaces (email admin, pass admin)
@@ -188,6 +210,14 @@ image::docs/groovy_token.png[]
 TIP: The docker image comes in with Java installed at `/usr/lib/jvm/java-8-openjdk-amd64`.
 You can go to `Global Tools` and create a JDK with `jdk8` id and JAVA_HOME
  pointing to `/usr/lib/jvm/java-8-openjdk-amd64`
+
+To set the default one just follow these steps:
+
+image::docs/manage_jenkins.png[caption="Step 1: ", title="Click 'Manage Jenkins'"]
+
+image::docs/global_tool.png[caption="Step 2: ", title="Click 'Global Tool'"]
+
+image::docs/jdk.png[caption="Step 3: ", title="Fill out JDK Installation"]
 
 === Add Jenkins credentials for GitHub
 
