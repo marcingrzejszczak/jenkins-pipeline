@@ -168,31 +168,15 @@ Then Jenkins will be running on port `8080` and Artifactory `8081`.
 === Setup Jenkins env vars
 
 TIP: If you want to only play around with the demo that we've prepared
-you can skip this section and use our defaults
+you can skip this section and use our defaults.
 
 IMPORTANT: If you're using a docker-machine then for sure you have to update
  the `REPO_WITH_JARS` to point to your Docker Machine address e.g. `192.168.99.100`
  instead of `localhost`
 
-You need to be able to pass the environment variables to your jobs. Those
-env vars are:
-
-[frame="topbot",options="header,footer"]
-|======================
-|Property Name  | Property Description | Default value
-|CF_API_URL | The URL to the CF Api | api.local.pcfdev.io
-|CF_TEST_ORG    | Name of the org for the test env | pcfdev-org
-|CF_TEST_SPACE  | Name of the space for the test env | pcfdev-space
-|CF_STAGE_ORG   | Name of the org for the stage env | pcfdev-org
-|CF_STAGE_SPACE | Name of the space for the stage env | pcfdev-space
-|CF_PROD_ORG   | Name of the org for the prod env | pcfdev-org
-|CF_PROD_SPACE | Name of the space for the prod env | pcfdev-space
-|REPO_WITH_JARS | URL to repo with the deployed jars | http://localhost:8081/artifactory/libs-release-local
-|M2_SETTINGS_REPO_ID | The id of server from Maven settings.xml | artifactory-local
-|JDK_VERSION | The name of the JDK installation | jdk8
-|======================
-
-There's a number of ways to achieve it!
+IMPORTANT: If you're choosing the global envs, you *HAVE* to remove the other approach
+(e.g. if you set the global env for `REPO_WITH_JARS`, please remove that property in the
+seed job
 
 ==== Global envs
 
@@ -219,6 +203,25 @@ image::docs/seed.png[]
 
 In this example we could parametrize the `REPOS` and `REPO_WITH_JARS` params.
 
+==== All env vars
+
+The env vars that are used in all of the jobs are as follows:
+
+[frame="topbot",options="header,footer"]
+|======================
+|Property Name  | Property Description | Default value
+|CF_API_URL | The URL to the CF Api | api.local.pcfdev.io
+|CF_TEST_ORG    | Name of the org for the test env | pcfdev-org
+|CF_TEST_SPACE  | Name of the space for the test env | pcfdev-space
+|CF_STAGE_ORG   | Name of the org for the stage env | pcfdev-org
+|CF_STAGE_SPACE | Name of the space for the stage env | pcfdev-space
+|CF_PROD_ORG   | Name of the org for the prod env | pcfdev-org
+|CF_PROD_SPACE | Name of the space for the prod env | pcfdev-space
+|REPO_WITH_JARS | URL to repo with the deployed jars | http://localhost:8081/artifactory/libs-release-local
+|M2_SETTINGS_REPO_ID | The id of server from Maven settings.xml | artifactory-local
+|JDK_VERSION | The name of the JDK installation | jdk8
+|======================
+
 === Additional setup
 
 ==== Enable Groovy Token Macro Processing
@@ -232,21 +235,42 @@ image::docs/groovy_token.png[]
 - by default we assume that you have jdk with id `jdk8` configured
 - if you want a different one just override `JDK_VERSION` env var and point to the proper one
 
-TIP: The docker image comes in with Java installed at `/usr/lib/jvm/java-8-openjdk-amd64`.
-You can go to `Global Tools` and create a JDK with `jdk8` id and JAVA_HOME
- pointing to `/usr/lib/jvm/java-8-openjdk-amd64`
-
 To set the default one just follow these steps:
+
+{nbsp}
+{nbsp}
 
 image::docs/manage_jenkins.png[caption="Step 1: ", title="Click 'Manage Jenkins'"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/global_tool.png[caption="Step 2: ", title="Click 'Global Tool'"]
 
+{nbsp}
+{nbsp}
 
+image::docs/jdk_installation.png[caption="Step 3: ", title="Click 'JDK Installations'"]
 
-image::docs/jdk.png[caption="Step 3: ", title="Fill out JDK Installation with `/usr/lib/jvm/java-8-openjdk-amd64`"]
+{nbsp}
+{nbsp}
+
+image::docs/jdk_installation_oracle.png[caption="Step 4: ", title="Fill out Oracle installation"]
+
+{nbsp}
+{nbsp}
+
+image::docs/jdk_user_pass.png[caption="Step 5: ", title="Enter Oracle username and pass"]
+
+{nbsp}
+{nbsp}
+
+image::docs/jdk_account.png[caption="Step 6: ", title="Provide your credentials for Oracle"]
+
+{nbsp}
+{nbsp}
+
+And that's it!
 
 === Add Jenkins credentials for GitHub
 
@@ -262,20 +286,28 @@ You have to set credentials with ids: `cf-test`, `cf-stage`, `cf-prod`, `git`.
 
 Below you can find instructions on how to set a credential (e.g. for `cf-test` credential).
 
+{nbsp}
+{nbsp}
+
 image::docs/credentials_system.png[caption="Step 1: ", title="Click 'Credentials, System'"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/credentials_global.png[caption="Step 2: ", title="Click 'Global Credentials'"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/credentials_add.png[caption="Step 3: ", title="Click 'Add credentials'"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/credentials_example.png[caption="Step 4: ", title="Fill out the user / password and provide the ID (in this example `cf-test`)"]
 
+{nbsp}
+{nbsp}
 
 In your scripts we reference the credentials via IDs. These are the defaults for credentials
 
@@ -322,39 +354,48 @@ seed.
 Anyways, to run the demo just provide in the `REPOS` var the comma separated
  list of URLs of the 2 aforementioned forks of `github-webhook` and `github-analytics'.
 
-
+{nbsp}
+{nbsp}
 
 image::docs/seed_click.png[caption="Step 1: ", title="Click the 'jenkins-pipeline-seed' job"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/seed_run.png[caption="Step 2: ", title="Click the 'Build with parameters'"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/seed.png[caption="Step 3: ", title="Provide the parameters (you'll have more of them)"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/seed_built.png[caption="Step 4: ", title="This is how the results of seed should look like"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/seed_views.png[caption="Step 5: ", title="Click the 'github-webhook' view"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/pipeline_run.png[caption="Step 6: ", title="Run the pipeline"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/pipeline_run_props.png[caption="Step 7: ", title="You can set some properties (just click 'Build' to proceed) "]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/pipeline_manual.png[caption="Step 8: ", title="Click the manual step to go to stage (remember about killing the apps on test env)"]
 
-
+{nbsp}
+{nbsp}
 
 image::docs/pipeline_finished.png[caption="Step 9: ", title="The full pipeline should look like this"]
 
