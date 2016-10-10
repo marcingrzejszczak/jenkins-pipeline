@@ -50,9 +50,16 @@ parsedRepos.each {
 		}
 		wrappers {
 			deliveryPipelineVersion(pipelineVersion, true)
-			maskPasswords()
 			environmentVariables(defaults.defaultEnvVars)
 			parameters(PipelineDefaults.defaultParams())
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		jdk(jdkVersion)
 		scm {
@@ -100,11 +107,18 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Test', 'Deploy to test')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			maskPasswords()
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
 				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', cfTestCredentialId)
+			}
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
 			}
 		}
 		scm {
@@ -143,6 +157,14 @@ parsedRepos.each {
 			parameters(PipelineDefaults.defaultParams())
 			parameters PipelineDefaults.smokeTestParams()
 			environmentVariables(defaults.defaultEnvVars)
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		scm {
 			git {
@@ -177,11 +199,18 @@ parsedRepos.each {
 		deliveryPipelineConfiguration('Test', 'Deploy to test latest prod version')
 		wrappers {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
-			maskPasswords()
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
 				usernamePassword('CF_TEST_USERNAME', 'CF_TEST_PASSWORD', cfTestCredentialId)
+			}
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
 			}
 		}
 		scm {
@@ -222,6 +251,14 @@ parsedRepos.each {
 			parameters {
 				stringParam('LATEST_PROD_TAG', 'master', 'Latest production tag. If "master" is picked then the step will be ignored')
 			}
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		scm {
 			git {
@@ -260,6 +297,14 @@ parsedRepos.each {
 			credentialsBinding {
 				usernamePassword('CF_STAGE_USERNAME', 'CF_STAGE_PASSWORD', cfStageCredentialId)
 			}
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		scm {
 			git {
@@ -294,6 +339,14 @@ parsedRepos.each {
 			parameters(PipelineDefaults.defaultParams())
 			parameters PipelineDefaults.smokeTestParams()
 			environmentVariables(defaults.defaultEnvVars)
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		scm {
 			git {
@@ -330,6 +383,14 @@ parsedRepos.each {
 			environmentVariables(defaults.defaultEnvVars)
 			credentialsBinding {
 				usernamePassword('CF_PROD_USERNAME', 'CF_PROD_PASSWORD', cfProdCredentialId)
+			}
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
 			}
 		}
 		scm {
@@ -372,6 +433,14 @@ parsedRepos.each {
 			deliveryPipelineVersion('${ENV,var="PIPELINE_VERSION"}', true)
 			parameters(PipelineDefaults.defaultParams())
 			environmentVariables(defaults.defaultEnvVars)
+			timestamps()
+			colorizeOutput()
+			maskPasswords()
+			timeout {
+				noActivity(300)
+				failBuild()
+				writeDescription('Build failed due to timeout after {0} minutes of inactivity')
+			}
 		}
 		steps {
 			shell("""#!/bin/bash
