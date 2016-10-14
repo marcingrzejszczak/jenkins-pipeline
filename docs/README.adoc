@@ -18,6 +18,9 @@ You can go through the setup for
 - <<jenkins, Jenkins using Jenkins Job DSL plugin>>
 - <<concourse, Concourse>>
 
+Each of these setups are available under the folders `jenkins` and
+`concourse` respectively.
+
 include::JENKINS.adoc[]
 
 include::CONCOURSE.adoc[]

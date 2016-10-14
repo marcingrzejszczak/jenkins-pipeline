@@ -84,7 +84,7 @@ Concourse + Artifactory can be ran locally. To do that just execute the
 [source,bash]
 ----
 git clone https://github.com/marcingrzejszczak/jenkins-pipeline
-cd jenkins-pipeline
+cd jenkins-pipeline/concourse
 ./start.sh 192.168.99.100
 ----
 
@@ -99,7 +99,7 @@ When Artifactory is running, just execute the `deploy_infra.sh` script from this
 [source,bash]
 ----
 git clone https://github.com/marcingrzejszczak/jenkins-pipeline
-cd jenkins-pipeline
+cd jenkins-pipeline/concourse
 ./deploy_infra.sh
 ----
 
