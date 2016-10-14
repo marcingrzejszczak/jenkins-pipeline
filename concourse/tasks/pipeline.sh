@@ -17,6 +17,10 @@ M2_LOCAL=${ROOT_FOLDER}/${M2_REPO}
 echo "Changing the maven local to [${M2_LOCAL}]"
 echo "Listing the m2 folder"
 ls -al "${ROOT_FOLDER}/m2/"
+ls -al "${ROOT_FOLDER}/m2/rootfs/opt/m2"
+ls -al "${ROOT_FOLDER}/m2/rootfs/opt/m2/root/.m2"
+ls -al "${ROOT_FOLDER}/m2/rootfs/"
+ls -al "${ROOT_FOLDER}/m2/rootfs/root"
 export MAVEN_ARGS="-Dmaven.repo.local=${M2_LOCAL}"
 
 echo "Sourcing file with pipeline functions"
