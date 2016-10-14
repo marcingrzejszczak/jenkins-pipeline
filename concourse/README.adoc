@@ -1,0 +1,3 @@
+:concourse-root-docs: ../docs/concourse
+
+include::../docs/CONCOURSE.adoc[]
