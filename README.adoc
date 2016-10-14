@@ -793,6 +793,7 @@ The repo comes with `credentials-sample.yml` which is set up with sample data (m
 
   - `app-url` - url pointing to your forked `github-webhook` repo
   - `github-private-key` - your private key to clone / tag GitHub repos
+  - `repo-with-jars` - the IP is set to the defaults for Docker Machine. You should update it to point to your setup
 
 Below you can see what environment variables are required by the scripts. To the right hand side you can see the default values for PCF Dev that we set in the `credentials-sample.yml`.
 
@@ -808,7 +809,7 @@ Below you can see what environment variables are required by the scripts. To the
 |CF_STAGE_SPACE | Name of the space for the stage env | pcfdev-space
 |CF_PROD_ORG   | Name of the org for the prod env | pcfdev-org
 |CF_PROD_SPACE | Name of the space for the prod env | pcfdev-space
-|REPO_WITH_JARS | URL to repo with the deployed jars | http://artifactory:8081/artifactory/libs-release-local
+|REPO_WITH_JARS | URL to repo with the deployed jars | http://192.168.99.100:8081/artifactory/libs-release-local
 |M2_SETTINGS_REPO_ID | The id of server from Maven settings.xml | artifactory-local
 |======================
 
@@ -938,3 +939,9 @@ Yes! Assuming that pieline name is `github-webhook` and job name is `build-and-u
 ----
 fly watch --job github-webhook/build-and-upload -t docker
 ----
+
+==== I clicked the job and it's constantly pending...
+
+Don't worry... most likely you've just forgotten to click the `play` button to
+unpause the pipeline. Click to the top left, expand the list of pipelines and click
+the `play` button next to `github-webhook`.

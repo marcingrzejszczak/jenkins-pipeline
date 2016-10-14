@@ -20,7 +20,7 @@ resources:
  - name: m2
    type: docker-image
    source:
-    repository: making/spring-pipeline-m2
+    repository: springcloud/spring-pipeline-m2
 jobs:
   - name: generate-version
     public: true
@@ -362,7 +362,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: making/alpine-java-bash-git
+              repository: spring-cloud/pipeline-base
           inputs:
             - name: repo
             - name: tools
@@ -390,7 +390,7 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: making/alpine-java-bash-git
+              repository: springcloud/pipeline-base
           inputs:
             - name: repo
             - name: tools
