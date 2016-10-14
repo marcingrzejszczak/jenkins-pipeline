@@ -127,7 +127,8 @@ function deployEureka() {
     local env="${4}"
     echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${appName}], env [${env}]"
     local fileExists="true"
-    if [[ ! -e target/${jarName}.jar ]]; then
+    local fileName="`pwd`/target/${jarName}.jar"
+    if [[ ! -f "${fileName}" ]]; then
         fileExists="false"
     fi
     if [[ ${fileExists} == "false" || ( ${fileExists} == "true" && ${redeploy} == "true" ) ]]; then
@@ -135,7 +136,7 @@ function deployEureka() {
         restartApp "${appName}"
         createServiceWithName "${appName}"
     else
-        echo "Current folder is [`pwd`]; The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The [${fileName}] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
@@ -147,7 +148,8 @@ function deployStubRunnerBoot() {
     local rabbitmqService="${5:-github-rabbitmq}"
     local stubRunnerName="${6:-stubrunner}"
     local fileExists="true"
-    if [[ ! -e target/${jarName}.jar ]]; then
+    local fileName="`pwd`/target/${jarName}.jar"
+    if [[ ! -f "${fileName}" ]]; then
         fileExists="false"
     fi
     echo "Deploying Stub Runner. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${stubRunnerName}], eureka [${eurekaService}], rabbitmq [${rabbitmqService}]"
@@ -160,7 +162,7 @@ function deployStubRunnerBoot() {
         restartApp "${stubRunnerName}"
         createServiceWithName "${stubRunnerName}"
     else
-        echo "Current folder is [`pwd`]; The [target/${jarName}.jar] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The [${fileName}] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
