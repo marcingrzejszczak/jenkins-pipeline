@@ -1,0 +1,18 @@
+---
+platform: linux
+image_resource:
+  type: docker-image
+  source:
+    repository: making/alpine-java-bash-git
+inputs:
+  - name: tools
+  - name: concourse
+  - name: repo
+  - name: version
+  - name: m2
+outputs:
+  - name: out
+run:
+  path: /bin/bash
+  args:
+    - concourse/tasks/build-and-upload.sh

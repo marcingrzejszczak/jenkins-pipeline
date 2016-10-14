@@ -24,8 +24,8 @@ String cfStageCredentialId = binding.variables['CF_STAGE_CREDENTIAL_ID'] ?: 'cf-
 String cfProdCredentialId = binding.variables['CF_PROD_CREDENTIAL_ID'] ?: 'cf-prod'
 String gitEmail = binding.variables['GIT_EMAIL'] ?: 'pivo@tal.com'
 String gitName = binding.variables['GIT_NAME'] ?: 'Pivo Tal'
-boolean autoStage = binding.variables['AUTO_DEPLOY_TO_STAGE'] ?:  false
-boolean autoProd = binding.variables['AUTO_DEPLOY_TO_PROD'] ?:  true
+boolean autoStage = Boolean.parseBoolean(binding.variables['AUTO_DEPLOY_TO_STAGE'] as String)
+boolean autoProd = Boolean.parseBoolean(binding.variables['AUTO_DEPLOY_TO_PROD'] as String)
 String scriptsDir = binding.variables['SCRIPTS_DIR'] ?: "${WORKSPACE}/common/src/main/bash"
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
