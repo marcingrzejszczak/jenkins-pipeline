@@ -936,5 +936,5 @@ Yes! Assuming that pieline name is `github-webhook` and job name is `build-and-u
 
 [source,bash]
 ----
-fly watch --job github-webhook/build-and-upload -t main
+fly watch --job github-webhook/build-and-upload -t docker
 ----
