@@ -90,8 +90,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/build_and_upload.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/build_and_upload.sh')}
 		""")
 		}
 		publishers {
@@ -144,8 +144,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_deploy.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/test_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -189,8 +189,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_smoke.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/test_smoke.sh')}
 		""")
 		}
 		publishers {
@@ -236,8 +236,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_rollback_deploy.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/test_rollback_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -283,8 +283,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_rollback_smoke.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/test_rollback_smoke.sh')}
 		""")
 		}
 		publishers {
@@ -341,8 +341,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/stage_deploy.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/stage_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -383,8 +383,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/stage_e2e.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/stage_e2e.sh')}
 		""")
 		}
 		publishers {
@@ -441,8 +441,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/prod_deploy.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh')}
+		${dsl.readFileFromWorkspace('src/main/bash/prod_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -480,8 +480,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 			set - e
 
-			${dsl.readFileFromWorkspace('/pipeline.sh') }
-			${dsl.readFileFromWorkspace('/prod_complete.sh') }
+			${dsl.readFileFromWorkspace('src/main/bash/pipeline.sh') }
+			${dsl.readFileFromWorkspace('src/main/bash/prod_complete.sh') }
 		""")
 		}
 	}
