@@ -347,7 +347,7 @@ The env vars that are used in all of the jobs are as follows:
 |GIT_NAME | The name used by Git to tag repo | Pivo Tal
 |======================
 
-===== Set Git email / user
+==== Set Git email / user
 
 Since our pipeline is setting the git user / name explicitly for the build step
  you'd have to go to `Configure` of the build step and modify the Git name / email.
@@ -530,7 +530,7 @@ contained them. To fix this, just remove the tags
 git tag -l | xargs -n 1 git push --delete origin
 ----
 
-===== I want to provide a different JDK version
+==== I want to provide a different JDK version
 
 - by default we assume that you have jdk with id `jdk8` configured
 - if you want a different one just override `JDK_VERSION` env var and point to the proper one
