@@ -16,15 +16,6 @@ source ${ROOT_FOLDER}/${TOOLS_RESOURCE}/concourse/tasks/pipeline.sh
 echo "Testing the built application on test environment"
 cd ${ROOT_FOLDER}/${REPO_RESOURCE}
 
-echo "Retrieving group and artifact id - it can take a while..."
-retrieveGroupId
-retrieveArtifactId
-projectGroupId=$( retrieveGroupId )
-projectArtifactId=$( retrieveArtifactId )
-mkdir target
-logInToCf ${REDOWNLOAD_INFRA} ${CF_TEST_USERNAME} ${CF_TEST_PASSWORD} ${CF_TEST_ORG} ${CF_TEST_SPACE} ${CF_API_URL}
-propagatePropertiesForTests ${projectArtifactId}
-readTestPropertiesFromFile
+prepareForSmokeTests "${REDOWNLOAD_INFRA}" "${CF_TEST_USERNAME}" "${CF_TEST_PASSWORD}" "${CF_TEST_ORG}" "${CF_TEST_SPACE} ${CF_TEST_API_URL}"
 
-echo "Retrieved application and stub runner urls"
 . ${SCRIPTS_OUTPUT_FOLDER}/test_smoke.sh

@@ -15,4 +15,5 @@ source ${ROOT_FOLDER}/${TOOLS_RESOURCE}/concourse/tasks/pipeline.sh
 
 echo "Deploying the built application on test environment"
 cd ${ROOT_FOLDER}/${REPO_RESOURCE}
+
 . ${SCRIPTS_OUTPUT_FOLDER}/prod_complete.sh

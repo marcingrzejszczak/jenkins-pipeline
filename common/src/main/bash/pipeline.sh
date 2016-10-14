@@ -291,3 +291,41 @@ function retrieveArtifactId() {
     result=$( echo "${result}" | tail -1 )
     echo "${result}"
 }
+
+# Jenkins passes these as a separate step, in Concourse we'll do it manually
+function prepareForSmokeTests() {
+    local redownloadInfra="${1}"
+    local username="${2}"
+    local password="${3}"
+    local org="${4}"
+    local space="${5}"
+    local api="${6}"
+    echo "Retrieving group and artifact id - it can take a while..."
+    retrieveGroupId
+    retrieveArtifactId
+    projectGroupId=$( retrieveGroupId )
+    projectArtifactId=$( retrieveArtifactId )
+    mkdir -p target
+    logInToCf "${redownloadInfra}" "${username}" "${password}" "${org}" "${space}" "${api}"
+    propagatePropertiesForTests ${projectArtifactId}
+    readTestPropertiesFromFile
+}
+
+# Jenkins passes these as a separate step, in Concourse we'll do it manually
+function prepareForE2eTests() {
+    local redownloadInfra="${1}"
+    local username="${2}"
+    local password="${3}"
+    local org="${4}"
+    local space="${5}"
+    local api="${6}"
+    echo "Retrieving group and artifact id - it can take a while..."
+    retrieveGroupId
+    retrieveArtifactId
+    projectGroupId=$( retrieveGroupId )
+    projectArtifactId=$( retrieveArtifactId )
+    mkdir -p target
+    logInToCf "${redownloadInfra}" "${username}" "${password}" "${org}" "${space}" "${api}"
+    propagatePropertiesForTests ${projectArtifactId}
+    readTestPropertiesFromFile
+}

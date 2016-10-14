@@ -16,15 +16,6 @@ source ${ROOT_FOLDER}/${TOOLS_RESOURCE}/concourse/tasks/pipeline.sh
 echo "Testing the built application on stage environment"
 cd ${ROOT_FOLDER}/${REPO_RESOURCE}
 
-echo "Retrieving group and artifact id - it can take a while..."
-retrieveGroupId
-retrieveArtifactId
-projectGroupId=$( retrieveGroupId )
-projectArtifactId=$( retrieveArtifactId )
-mkdir target
-logInToCf ${REDOWNLOAD_INFRA} ${CF_STAGE_USERNAME} ${CF_STAGE_PASSWORD} ${CF_STAGE_ORG} ${CF_STAGE_SPACE} ${CF_API_URL}
-propagatePropertiesForTests ${projectArtifactId}
-readTestPropertiesFromFile
+prepareForE2eTests "${REDOWNLOAD_INFRA}" "${CF_STAGE_USERNAME}" "${CF_STAGE_PASSWORD}" "${CF_STAGE_ORG}" "${CF_STAGE_SPACE}" "${CF_STAGE_API_URL}"
 
-echo "Retrieved application and stub runner urls"
 . ${SCRIPTS_OUTPUT_FOLDER}/stage_e2e.sh
