@@ -126,9 +126,9 @@ function deployEureka() {
     local appName="${3}"
     local env="${4}"
     echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${appName}], env [${env}]"
-    local fileExists = "true"
+    local fileExists="true"
     if [[ ! -e target/${jarName}.jar ]]; then
-        fileExists = "false"
+        fileExists="false"
     fi
     if [[ ${fileExists} == "false" || ( ${fileExists} == "true" && ${redeploy} == "true" ) ]]; then
         deployAppWithName "${appName}" "${jarName}" "${env}"
@@ -146,9 +146,9 @@ function deployStubRunnerBoot() {
     local eurekaService="${4:-github-eureka}"
     local rabbitmqService="${5:-github-rabbitmq}"
     local stubRunnerName="${6:-stubrunner}"
-    local fileExists = "true"
+    local fileExists="true"
     if [[ ! -e target/${jarName}.jar ]]; then
-        fileExists = "false"
+        fileExists="false"
     fi
     echo "Deploying Stub Runner. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${stubRunnerName}], eureka [${eurekaService}], rabbitmq [${rabbitmqService}]"
     if [[ ${fileExists} == "false" || ( ${fileExists} == "true" && ${redeploy} == "true" ) ]]; then
