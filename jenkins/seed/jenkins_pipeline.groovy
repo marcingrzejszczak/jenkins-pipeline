@@ -41,15 +41,15 @@ factory.job('jenkins-pipeline-seed') {
         }
     }
     steps {
-        gradle("clean build")
+        gradle("clean build workspace")
         dsl {
-            external('jobs/jenkins_pipeline_sample*.groovy')
+            external('jenkins/jobs/jenkins_pipeline_sample*.groovy')
             removeAction('DISABLE')
             removeViewAction('DELETE')
             ignoreExisting(false)
             lookupStrategy('SEED_JOB')
             additionalClasspath([
-                'src/main/groovy', 'src/main/resources', 'src/main/bash'
+                'src/main/groovy', 'src/main/resources', 'build/workspace'
             ].join("\n"))
         }
     }

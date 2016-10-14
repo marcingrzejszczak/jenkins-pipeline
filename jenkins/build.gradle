@@ -33,9 +33,16 @@ test {
     }
 }
 
-task workspace(type: Copy) {
-    from fileTree(dir: 'jobs')
-    from new File(project(":common").projectDir, 'src/main/bash')
+task workspace(dependsOn:['copyDefaults', 'copyBashScripts']) {
+}
+
+task copyDefaults(type: Copy) {
     from 'src/main/groovy'
+    from 'src/main/resources'
     into 'build/workspace'
+}
+
+task copyBashScripts(type: Copy) {
+    from new File(project(":common").projectDir, 'src/main/bash')
+    into 'build/workspace/src/main/bash'
 }
