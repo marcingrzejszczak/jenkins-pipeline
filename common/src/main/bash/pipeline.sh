@@ -126,12 +126,16 @@ function deployEureka() {
     local appName="${3}"
     local env="${4}"
     echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${appName}], env [${env}]"
-    if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
+    local fileExists = "true"
+    if [[ ! -e target/${jarName}.jar ]]; then
+        fileExists = "false"
+    fi
+    if [[ ${fileExists} == "false" || ( ${fileExists} == "true" && ${redeploy} == "true" ) ]]; then
         deployAppWithName "${appName}" "${jarName}" "${env}"
         restartApp "${appName}"
         createServiceWithName "${appName}"
     else
-        echo "The target/${jarName}.jar is missing or redeploy flag was turned off"
+        echo "The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
@@ -142,8 +146,12 @@ function deployStubRunnerBoot() {
     local eurekaService="${4:-github-eureka}"
     local rabbitmqService="${5:-github-rabbitmq}"
     local stubRunnerName="${6:-stubrunner}"
-    echo "Deploying Eureka. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${stubRunnerName}], eureka [${eurekaService}], rabbitmq [${rabbitmqService}]"
-    if [[ ! -e target/${jarName}.jar || ( -e target/${jarName}.jar && ${redeploy} == "true" ) ]]; then
+    local fileExists = "true"
+    if [[ ! -e target/${jarName}.jar ]]; then
+        fileExists = "false"
+    fi
+    echo "Deploying Stub Runner. Options - redeploy [${redeploy}], jar name [${jarName}], app name [${stubRunnerName}], eureka [${eurekaService}], rabbitmq [${rabbitmqService}]"
+    if [[ ${fileExists} == "false" || ( ${fileExists} == "true" && ${redeploy} == "true" ) ]]; then
         deployAppWithName "${stubRunnerName}" "${jarName}" "${env}"
         local mavenProp="$( extractMavenProperty "stubrunner.ids" )"
         setEnvVar "${stubRunnerName}" "stubrunner.ids" "${mavenProp}"
@@ -152,7 +160,7 @@ function deployStubRunnerBoot() {
         restartApp "${stubRunnerName}"
         createServiceWithName "${stubRunnerName}"
     else
-        echo "The target/${jarName}.jar is missing or redeploy flag was turned off"
+        echo "The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
