@@ -17,10 +17,13 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+org="marcingrzejszczak"
+repo="jenkins-pipeline"
+branch="merging"
 source_file = File.join(File.dirname(__FILE__), options[:input])
-output_file = File.join(File.dirname(__FILE__),'README.adoc')
-jenkins_docs = "https://raw.githubusercontent.com/marcingrzejszczak/jenkins-pipeline/merging/docs/jenkins"
-concourse_docs = "https://raw.githubusercontent.com/marcingrzejszczak/jenkins-pipeline/merging/docs/concourse"
+output_file = options[:output] || File.join(File.dirname(__FILE__),'README.adoc')
+jenkins_docs = "https://raw.githubusercontent.com/" + org + "/" + repo + "/" + branch + "/docs/jenkins"
+concourse_docs = "https://raw.githubusercontent.com/" + org + "/" + repo + "/" + branch + "/docs/concourse"
 
 #unless (source_file = ARGV.shift)
 #  warn 'Please specify an AsciiDoc source file to coalesce.'
