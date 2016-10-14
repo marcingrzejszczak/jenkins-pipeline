@@ -26,7 +26,7 @@ String gitEmail = binding.variables['GIT_EMAIL'] ?: 'pivo@tal.com'
 String gitName = binding.variables['GIT_NAME'] ?: 'Pivo Tal'
 boolean autoStage = binding.variables['AUTO_DEPLOY_TO_STAGE'] ?:  false
 boolean autoProd = binding.variables['AUTO_DEPLOY_TO_PROD'] ?:  true
-String scriptsDir = binding.variables['SCRIPTS_DIR'] ?: '${PWD}/common/src/main/bash'
+String scriptsDir = binding.variables['SCRIPTS_DIR'] ?: "${PWD}/common/src/main/bash"
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
