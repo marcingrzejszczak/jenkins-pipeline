@@ -16,9 +16,6 @@ source ${ROOT_FOLDER}/${TOOLS_RESOURCE}/concourse/tasks/pipeline.sh
 echo "Deploying the built application on prod environment"
 cd ${ROOT_FOLDER}/${REPO_RESOURCE}
 
-echo "Retrieving group and artifact id - it can take a while..."
-retrieveGroupId
-retrieveArtifactId
 . ${SCRIPTS_OUTPUT_FOLDER}/prod_deploy.sh
 
 echo "Tagging the project with prod tag"

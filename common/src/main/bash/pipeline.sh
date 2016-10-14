@@ -135,7 +135,7 @@ function deployEureka() {
         restartApp "${appName}"
         createServiceWithName "${appName}"
     else
-        echo "The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
@@ -160,7 +160,7 @@ function deployStubRunnerBoot() {
         restartApp "${stubRunnerName}"
         createServiceWithName "${stubRunnerName}"
     else
-        echo "The target/${jarName}.jar is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The [target/${jarName}.jar] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
@@ -205,7 +205,7 @@ function downloadJar() {
     local pathToJar="${repoWithJars}/${changedGroupId}/${artifactId}/${version}/${artifactId}-${version}.jar"
     if [[ ! -e ${destination} || ( -e ${destination} && ${redownloadInfra} == "true" ) ]]; then
         mkdir -p target
-        echo "Downloading [${pathToJar}] to [${destination}]"
+        echo "Current folder is [`pwd`]; Downloading [${pathToJar}] to [${destination}]"
         curl "${pathToJar}" -o "${destination}"
     else
         echo "File [${destination}] exists and redownload flag was set to false. Will not download it again"
