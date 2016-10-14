@@ -202,7 +202,7 @@ function downloadJar() {
     local groupId="${3}"
     local artifactId="${4}"
     local version="${5}"
-    local destination="target/${artifactId}-${version}.jar"
+    local destination="`pwd`/target/${artifactId}-${version}.jar"
     local changedGroupId="$( echo "${groupId}" | tr . / )"
     local pathToJar="${repoWithJars}/${changedGroupId}/${artifactId}/${version}/${artifactId}-${version}.jar"
     if [[ ! -e ${destination} || ( -e ${destination} && ${redownloadInfra} == "true" ) ]]; then
