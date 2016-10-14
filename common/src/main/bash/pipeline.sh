@@ -136,7 +136,7 @@ function deployEureka() {
         restartApp "${appName}"
         createServiceWithName "${appName}"
     else
-        echo "Current folder is [`pwd`]; The [${fileName}] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The [${fileName}] exists [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
@@ -162,7 +162,7 @@ function deployStubRunnerBoot() {
         restartApp "${stubRunnerName}"
         createServiceWithName "${stubRunnerName}"
     else
-        echo "Current folder is [`pwd`]; The [${fileName}] is missing [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
+        echo "Current folder is [`pwd`]; The [${fileName}] exists [${fileExists}]; redeploy flag was set [${redeploy}]. Skipping deployment"
     fi
 }
 
