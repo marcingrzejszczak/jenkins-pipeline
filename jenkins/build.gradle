@@ -6,7 +6,7 @@ sourceSets {
             srcDirs 'jobs', 'src/main/groovy'
         }
         resources {
-            srcDirs 'src/main/resources', 'src/main/bash'
+            srcDirs 'src/main/resources', new File(project(":common").projectDir, 'src/main/bash')
         }
     }
 }
@@ -18,7 +18,6 @@ repositories {
 }
 
 dependencies {
-    compile project(":common")
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile 'org.jenkins-ci.plugins:job-dsl-core:1.50'
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
@@ -33,16 +32,9 @@ test {
     }
 }
 
-task workspace(dependsOn:['copyDefaults', 'copyBashScripts']) {
-}
-
-task copyDefaults(type: Copy) {
+task workspace(type: Copy) {
     from 'src/main/groovy'
     from 'src/main/resources'
-    into 'build/workspace'
-}
-
-task copyBashScripts(type: Copy) {
     from new File(project(":common").projectDir, 'src/main/bash')
-    into 'build/workspace/src/main/bash'
+    into 'build/workspace'
 }
