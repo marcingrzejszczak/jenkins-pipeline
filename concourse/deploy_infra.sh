@@ -19,6 +19,8 @@ mkdir -p ${FOLDER}
 
 echo "Docker is running at [${POTENTIAL_DOCKER_HOST}]"
 echo "Folder to clone the apps is [${FOLDER}]"
+rm -rf "${CURRENT}/${FOLDER}/github-eureka"
+rm -rf "${CURRENT}/${FOLDER}/github-analytics-stub-runner-boot"
 
 echo "Deploying Eureka to Artifactory"
 cd "${CURRENT}/${FOLDER}"

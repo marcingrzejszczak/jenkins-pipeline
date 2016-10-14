@@ -85,10 +85,18 @@ Concourse + Artifactory can be ran locally. To do that just execute the
 ----
 git clone https://github.com/marcingrzejszczak/jenkins-pipeline
 cd jenkins-pipeline/concourse
+./setup-docker-compose.sh
 ./start.sh 192.168.99.100
 ----
 
-where `192.168.99.100` is an external URL of Concourse (equal to Docker-Machine ip).
+The `setup-docker-compose.sh` script should be executed once only to allow
+generation of keys.
+
+The `192.168.99.100` param is an example of an external URL of Concourse
+(equal to Docker-Machine ip in this example).
+
+If you want to provide another ip that your machine is visible at you can call
+the `./whats_my_ip.sh` script.
 
 Then Concourse will be running on port `8080` and Artifactory `8081`.
 
