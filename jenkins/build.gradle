@@ -32,3 +32,11 @@ test {
         exceptionFormat = 'full'
     }
 }
+
+task workspace(type: Copy) {
+    from 'jobs'
+    from 'src/main/groovy'
+    from 'src/main/resources'
+    from new File(project(":common").projectDir, 'src/main/bash')
+    into 'build/workspace'
+}
