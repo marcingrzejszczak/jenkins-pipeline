@@ -6,10 +6,10 @@ image_resource:
     repository: making/alpine-java-bash-git
 inputs:
   - name: version
-  - name: concourse
+  - name: tools
 outputs:
   - name: out
 run:
   path: /bin/bash
   args:
-    - concourse/tasks/generate-version.sh
+    - tools/concourse/tasks/generate-version.sh

@@ -6,7 +6,6 @@ image_resource:
     repository: making/alpine-java-bash-git
 inputs:
   - name: tools
-  - name: concourse
   - name: repo
   - name: version
   - name: m2
@@ -15,4 +14,4 @@ outputs:
 run:
   path: /bin/bash
   args:
-    - concourse/tasks/prod-deploy.sh
+    - tools/concourse/tasks/prod-deploy.sh

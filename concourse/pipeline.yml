@@ -16,7 +16,7 @@ resources:
    type: git
    source:
     uri: {{tools-scripts-url}}
-    branch: master
+    branch: merging
  - name: m2
    type: docker-image
    source:
