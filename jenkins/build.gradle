@@ -6,7 +6,7 @@ sourceSets {
             srcDirs 'jobs', 'src/main/groovy'
         }
         resources {
-            srcDirs 'src/main/resources', new File(project(":common").projectDir, 'src/main/bash')
+            srcDirs 'src/main/resources'
         }
     }
 }
@@ -20,6 +20,7 @@ repositories {
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile 'org.jenkins-ci.plugins:job-dsl-core:1.50'
+    testCompile project(":common")
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude module: 'groovy-all'
     }
@@ -30,11 +31,4 @@ test {
     testLogging {
         exceptionFormat = 'full'
     }
-}
-
-task workspace(type: Copy) {
-    from 'src/main/groovy'
-    from 'src/main/resources'
-    from new File(project(":common").projectDir, 'src/main/bash')
-    into 'build/workspace'
 }

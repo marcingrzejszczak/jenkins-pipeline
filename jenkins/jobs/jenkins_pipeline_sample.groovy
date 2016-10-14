@@ -26,6 +26,7 @@ String gitEmail = binding.variables['GIT_EMAIL'] ?: 'pivo@tal.com'
 String gitName = binding.variables['GIT_NAME'] ?: 'Pivo Tal'
 boolean autoStage = binding.variables['AUTO_DEPLOY_TO_STAGE'] ?:  false
 boolean autoProd = binding.variables['AUTO_DEPLOY_TO_PROD'] ?:  true
+String scriptsDir = binding.variables['SCRIPTS_DIR'] ?: '${WORKSPACE}/common/src/main/bash'
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
@@ -90,8 +91,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/build_and_upload.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/build_and_upload.sh')}
 		""")
 		}
 		publishers {
@@ -144,8 +145,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_deploy.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/test_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -189,8 +190,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_smoke.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/test_smoke.sh')}
 		""")
 		}
 		publishers {
@@ -236,8 +237,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_rollback_deploy.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/test_rollback_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -283,8 +284,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/test_rollback_smoke.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/test_rollback_smoke.sh')}
 		""")
 		}
 		publishers {
@@ -341,8 +342,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/stage_deploy.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/stage_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -383,8 +384,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/stage_e2e.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/stage_e2e.sh')}
 		""")
 		}
 		publishers {
@@ -441,8 +442,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 		set -e
 
-		${dsl.readFileFromWorkspace('/pipeline.sh')}
-		${dsl.readFileFromWorkspace('/prod_deploy.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh')}
+		${dsl.readFileFromWorkspace(scriptsDir + '/prod_deploy.sh')}
 		""")
 		}
 		publishers {
@@ -480,8 +481,8 @@ parsedRepos.each {
 			shell("""#!/bin/bash
 			set - e
 
-			${dsl.readFileFromWorkspace('/pipeline.sh') }
-			${dsl.readFileFromWorkspace('/prod_complete.sh') }
+			${dsl.readFileFromWorkspace(scriptsDir + '/pipeline.sh') }
+			${dsl.readFileFromWorkspace(scriptsDir + '/prod_complete.sh') }
 		""")
 		}
 	}
