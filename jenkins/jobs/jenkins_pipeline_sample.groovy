@@ -30,7 +30,7 @@ String scriptsDir = binding.variables['SCRIPTS_DIR'] ?: "${WORKSPACE}/common/src
 
 // we're parsing the REPOS parameter to retrieve list of repos to build
 String repos = binding.variables['REPOS'] ?:
-		['https://github.com/dsyer/github-analytics',
+		['https://github.com/marcingrzejszczak/github-analytics',
 		 'github-webhook$https://github.com/marcingrzejszczak/atom-feed'].join(',')
 List<String> parsedRepos = repos.split(',')
 parsedRepos.each {

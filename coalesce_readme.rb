@@ -19,7 +19,7 @@ end.parse!
 
 org="marcingrzejszczak"
 repo="jenkins-pipeline"
-branch="merging"
+branch="master"
 source_file = File.join(File.dirname(__FILE__), options[:input])
 output_file = options[:output] || File.join(File.dirname(__FILE__),'README.adoc')
 jenkins_docs = "https://raw.githubusercontent.com/" + org + "/" + repo + "/" + branch + "/docs/jenkins"
